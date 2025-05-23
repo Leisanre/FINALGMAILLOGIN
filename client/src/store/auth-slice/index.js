@@ -7,141 +7,124 @@ const initialState = {
   user: null,
 };
 
+// Register user
 export const registerUser = createAsyncThunk(
-  "/auth/register",
-
-  async (formData) => {
-    const response = await axios.post(
-      "http://localhost:5000/api/auth/register",
-      formData,
-      {
-        withCredentials: true,
-      }
-    );
-
-    return response.data;
+  "auth/register",
+  async (formData, thunkAPI) => {
+    try {
+      const response = await axios.post(
+        "http://localhost:5000/api/auth/register",
+        formData,
+        { withCredentials: true }
+      );
+      return response.data;
+    } catch (error) {
+      return thunkAPI.rejectWithValue(error.response?.data || { success: false, message: "Registration failed" });
+    }
   }
 );
 
+// Login user
 export const loginUser = createAsyncThunk(
-  "/auth/login",
-
-  async (formData) => {
-    const response = await axios.post(
-      "http://localhost:5000/api/auth/login",
-      formData,
-      {
-        withCredentials: true,
-      }
-    );
-
-    return response.data;
+  "auth/login",
+  async (formData, thunkAPI) => {
+    try {
+      const response = await axios.post(
+        "http://localhost:5000/api/auth/login",
+        formData,
+        { withCredentials: true }
+      );
+      return response.data;
+    } catch (error) {
+      return thunkAPI.rejectWithValue(error.response?.data || { success: false, message: "Login failed" });
+    }
   }
 );
 
+// Google Login user
 export const googleLoginUser = createAsyncThunk(
-  "/auth/google-login",
-  async ({ googleToken }) => {
-    const response = await axios.post(
-      "http://localhost:5000/api/auth/google-login",
-      { googleToken },
-      { withCredentials: true }
-    );
-    return response.data;
+  "auth/google-login",
+  async ({ googleToken }, thunkAPI) => {
+    try {
+      const response = await axios.post(
+        "http://localhost:5000/api/auth/google-login",
+        { googleToken },
+        { withCredentials: true }
+      );
+      return response.data;
+    } catch (error) {
+      return thunkAPI.rejectWithValue(error.response?.data || { success: false, message: "Google login failed" });
+    }
   }
 );
 
-
-export const logoutUser = createAsyncThunk(
-  "/auth/logout",
-
-  async () => {
+// Logout user
+export const logoutUser = createAsyncThunk("auth/logout", async (_, thunkAPI) => {
+  try {
     const response = await axios.post(
       "http://localhost:5000/api/auth/logout",
       {},
-      {
-        withCredentials: true,
-      }
+      { withCredentials: true }
     );
-
     return response.data;
+  } catch (error) {
+    return thunkAPI.rejectWithValue(error.response?.data || { success: false });
   }
-);
+});
 
-export const checkAuth = createAsyncThunk(
-  "/auth/checkauth",
-
-  async () => {
-    const response = await axios.get(
-      "http://localhost:5000/api/auth/check-auth",
-      {
-        withCredentials: true,
-        headers: {
-          "Cache-Control":
-            "no-store, no-cache, must-revalidate, proxy-revalidate",
-        },
-      }
-    );
-
+// Check Auth status
+export const checkAuth = createAsyncThunk("auth/checkauth", async (_, thunkAPI) => {
+  try {
+    const response = await axios.get("http://localhost:5000/api/auth/check-auth", {
+      withCredentials: true,
+      headers: {
+        "Cache-Control": "no-store, no-cache, must-revalidate, proxy-revalidate",
+      },
+    });
     return response.data;
+  } catch (error) {
+    return thunkAPI.rejectWithValue(error.response?.data || { success: false });
   }
-);
+});
 
 const authSlice = createSlice({
   name: "auth",
   initialState,
-  reducers: {
-    setUser: (state, action) => {},
-  },
+  reducers: {},
   extraReducers: (builder) => {
     builder
+      // Register
       .addCase(registerUser.pending, (state) => {
         state.isLoading = true;
       })
-      .addCase(registerUser.fulfilled, (state, action) => {
+      .addCase(registerUser.fulfilled, (state) => {
         state.isLoading = false;
-        state.user = null;
         state.isAuthenticated = false;
+        state.user = null;
       })
-      .addCase(registerUser.rejected, (state, action) => {
+      .addCase(registerUser.rejected, (state) => {
         state.isLoading = false;
-        state.user = null;
         state.isAuthenticated = false;
+        state.user = null;
       })
+
+      // Login
       .addCase(loginUser.pending, (state) => {
         state.isLoading = true;
       })
       .addCase(loginUser.fulfilled, (state, action) => {
-        console.log(action);
+        state.isLoading = false;
+        state.user = action.payload.success ? action.payload.user : null;
+        state.isAuthenticated = action.payload.success;
+      })
+      .addCase(loginUser.rejected, (state) => {
+        state.isLoading = false;
+        state.user = null;
+        state.isAuthenticated = false;
+      })
 
-        state.isLoading = false;
-        state.user = action.payload.success ? action.payload.user : null;
-        state.isAuthenticated = action.payload.success;
-      })
-      .addCase(loginUser.rejected, (state, action) => {
-        state.isLoading = false;
-        state.user = null;
-        state.isAuthenticated = false;
-      })
-      .addCase(checkAuth.pending, (state) => {
-        state.isLoading = true;
-      })
-      .addCase(checkAuth.fulfilled, (state, action) => {
-        state.isLoading = false;
-        state.user = action.payload.success ? action.payload.user : null;
-        state.isAuthenticated = action.payload.success;
-      })
-      .addCase(checkAuth.rejected, (state, action) => {
-        state.isLoading = false;
-        state.user = null;
-        state.isAuthenticated = false;
-      })
-      .addCase(logoutUser.fulfilled, (state, action) => {
-        state.isLoading = false;
-        state.user = null;
-        state.isAuthenticated = false;
-      })
-            .addCase(googleLoginUser.pending, (state) => {
+      // Google Login
+      .addCase(googleLoginUser.pending, (state) => {
         state.isLoading = true;
       })
       .addCase(googleLoginUser.fulfilled, (state, action) => {
@@ -153,9 +136,30 @@ const authSlice = createSlice({
         state.isLoading = false;
         state.user = null;
         state.isAuthenticated = false;
+      })
+
+      // Check Auth
+      .addCase(checkAuth.pending, (state) => {
+        state.isLoading = true;
+      })
+      .addCase(checkAuth.fulfilled, (state, action) => {
+        state.isLoading = false;
+        state.user = action.payload.success ? action.payload.user : null;
+        state.isAuthenticated = action.payload.success;
+      })
+      .addCase(checkAuth.rejected, (state) => {
+        state.isLoading = false;
+        state.user = null;
+        state.isAuthenticated = false;
+      })
+
+      // Logout
+      .addCase(logoutUser.fulfilled, (state) => {
+        state.isLoading = false;
+        state.user = null;
+        state.isAuthenticated = false;
       });
   },
 });
 
-export const { setUser } = authSlice.actions;
 export default authSlice.reducer;
