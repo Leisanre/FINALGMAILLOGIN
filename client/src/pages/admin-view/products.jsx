@@ -16,6 +16,17 @@ import {
   editProduct,
   fetchAllProducts,
 } from "@/store/admin/products-slice";
+import {
+  addGenre,
+  getGenres,
+  deleteGenre,
+  addCategory,
+  getCategories,
+  deleteCategory,
+  addBrand,
+  getBrands,
+  deleteBrand,
+} from "@/store/common-slice";
 import { Fragment, useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 
@@ -25,6 +36,7 @@ const initialFormData = {
   description: "",
   category: "",
   brand: "",
+  genre: "",
   price: "",
   salePrice: "",
   totalStock: "",
@@ -32,53 +44,49 @@ const initialFormData = {
 };
 
 function AdminProducts() {
-  const [openCreateProductsDialog, setOpenCreateProductsDialog] =
-    useState(false);
+  const [openCreateProductsDialog, setOpenCreateProductsDialog] = useState(false);
   const [formData, setFormData] = useState(initialFormData);
   const [imageFile, setImageFile] = useState(null);
   const [uploadedImageUrl, setUploadedImageUrl] = useState("");
   const [imageLoadingState, setImageLoadingState] = useState(false);
   const [currentEditedId, setCurrentEditedId] = useState(null);
+  const [newGenre, setNewGenre] = useState("");
+  const [newCategory, setNewCategory] = useState("");
+  const [newBrand, setNewBrand] = useState("");
 
   const { productList } = useSelector((state) => state.adminProducts);
+  // Make sure the slice name here matches your store setup (commonSlice or commonFeature)
+  const { genreList, categoryList, brandList } = useSelector(
+    (state) => state.commonFeature
+  );
   const dispatch = useDispatch();
   const { toast } = useToast();
 
   function onSubmit(event) {
     event.preventDefault();
 
-    currentEditedId !== null
-      ? dispatch(
-          editProduct({
-            id: currentEditedId,
-            formData,
-          })
-        ).then((data) => {
-          console.log(data, "edit");
-
-          if (data?.payload?.success) {
-            dispatch(fetchAllProducts());
-            setFormData(initialFormData);
-            setOpenCreateProductsDialog(false);
-            setCurrentEditedId(null);
-          }
-        })
-      : dispatch(
-          addNewProduct({
-            ...formData,
-            image: uploadedImageUrl,
-          })
-        ).then((data) => {
+    if (currentEditedId !== null) {
+      dispatch(editProduct({ id: currentEditedId, formData })).then((data) => {
+        if (data?.payload?.success) {
+          dispatch(fetchAllProducts());
+          setFormData(initialFormData);
+          setOpenCreateProductsDialog(false);
+          setCurrentEditedId(null);
+        }
+      });
+    } else {
+      dispatch(addNewProduct({ ...formData, image: uploadedImageUrl })).then(
+        (data) => {
           if (data?.payload?.success) {
             dispatch(fetchAllProducts());
             setOpenCreateProductsDialog(false);
             setImageFile(null);
             setFormData(initialFormData);
-            toast({
-              title: "Product add successfully",
-            });
+            toast({ title: "Product added successfully" });
           }
-        });
+        }
+      );
+    }
   }
 
   function handleDelete(getCurrentProductId) {
@@ -91,37 +99,171 @@ function AdminProducts() {
 
   function isFormValid() {
     return Object.keys(formData)
-      .filter((currentKey) => currentKey !== "averageReview")
-      .map((key) => formData[key] !== "")
-      .every((item) => item);
+      .filter((key) => key !== "averageReview")
+      .every((key) => formData[key] !== "");
+  }
+
+  function handleAddItem(e, value, setter, action, getAction, name) {
+    e.preventDefault();
+    if (!value.trim()) return;
+
+    dispatch(action(value)).then((data) => {
+      if (data?.payload?.success) {
+        toast({ title: `${name} added successfully` });
+        setter("");
+        dispatch(getAction());
+      } else {
+        toast({ title: `Failed to add ${name}`, variant: "destructive" });
+      }
+    });
   }
 
   useEffect(() => {
     dispatch(fetchAllProducts());
+    dispatch(getGenres());
+    dispatch(getCategories());
+    dispatch(getBrands());
   }, [dispatch]);
 
-  console.log(formData, "productList");
+  const modifiedFormControls = addProductFormElements.map((field) => {
+    if (["genre", "category", "brand"].includes(field.name)) {
+      const list =
+        field.name === "genre"
+          ? genreList
+          : field.name === "category"
+          ? categoryList
+          : brandList;
+      return {
+        ...field,
+        type: "select",
+        options: list.map((item) => ({
+          label: item.name || item,
+          value: item.name || item,
+        })),
+      };
+    }
+    return field;
+  });
 
   return (
     <Fragment>
-      <div className="mb-5 w-full flex justify-end">
+      <div className="mb-6 flex justify-between items-center">
+        <h1 className="text-2xl font-bold">Products</h1>
         <Button onClick={() => setOpenCreateProductsDialog(true)}>
           Add New Product
         </Button>
       </div>
-      <div className="grid gap-4 md:grid-cols-3 lg:grid-cols-4">
-        {productList && productList.length > 0
-          ? productList.map((productItem) => (
-              <AdminProductTile
-                setFormData={setFormData}
-                setOpenCreateProductsDialog={setOpenCreateProductsDialog}
-                setCurrentEditedId={setCurrentEditedId}
-                product={productItem}
-                handleDelete={handleDelete}
-              />
-            ))
-          : null}
+
+      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+        {productList &&
+          productList.length > 0 &&
+          productList.map((productItem) => (
+            <AdminProductTile
+              key={productItem.id}
+              setFormData={setFormData}
+              setOpenCreateProductsDialog={setOpenCreateProductsDialog}
+              setCurrentEditedId={setCurrentEditedId}
+              product={productItem}
+              handleDelete={handleDelete}
+            />
+          ))}
       </div>
+
+      <div className="mt-12 grid gap-8 md:grid-cols-2 lg:grid-cols-3">
+        {[
+          {
+            label: "Genre",
+            value: newGenre,
+            setter: setNewGenre,
+            action: addGenre,
+            getAction: getGenres,
+            list: genreList,
+            deleteAction: deleteGenre,
+          },
+          {
+            label: "Category",
+            value: newCategory,
+            setter: setNewCategory,
+            action: addCategory,
+            getAction: getCategories,
+            list: categoryList,
+            deleteAction: deleteCategory,
+          },
+          {
+            label: "Brand",
+            value: newBrand,
+            setter: setNewBrand,
+            action: addBrand,
+            getAction: getBrands,
+            list: brandList,
+            deleteAction: deleteBrand,
+          },
+        ].map(
+          ({
+            label,
+            value,
+            setter,
+            action,
+            getAction,
+            list,
+            deleteAction,
+          }) => (
+            <div
+              key={label}
+              className="bg-white border border-gray-200 rounded-xl p-6 shadow-sm"
+            >
+              <h2 className="text-lg font-semibold mb-4 text-gray-800">
+                Manage {label}s
+              </h2>
+              <form
+                onSubmit={(e) =>
+                  handleAddItem(e, value, setter, action, getAction, label)
+                }
+                className="flex gap-2 mb-4"
+              >
+                <input
+                  type="text"
+                  value={value}
+                  onChange={(e) => setter(e.target.value)}
+                  placeholder={`Enter new ${label.toLowerCase()}`}
+                  className="flex-1 px-4 py-2 rounded-md border border-gray-300 shadow-sm focus:outline-none focus:ring focus:ring-indigo-200"
+                  required
+                />
+                <Button type="submit">Add</Button>
+              </form>
+              {list?.length > 0 && (
+                <ul className="list-disc pl-5 space-y-1 text-sm text-gray-600 max-h-40 overflow-auto">
+                  {list.map((item) => (
+                    <li key={item._id || item} className="flex justify-between items-center">
+                      <span>{item.name || item}</span>
+                      <button
+                        onClick={() => {
+                          dispatch(deleteAction(item._id || item)).then((data) => {
+                            if (data?.payload?.success) {
+                              toast({ title: `${label} deleted successfully` });
+                              dispatch(getAction());
+                            } else {
+                              toast({
+                                title: `Failed to delete ${label}`,
+                                variant: "destructive",
+                              });
+                            }
+                          });
+                        }}
+                        className="ml-2 text-red-600 hover:underline"
+                        type="button"
+                      >
+                        Delete
+                      </button>
+                    </li>
+                  ))}
+                </ul>
+              )}
+            </div>
+          )
+        )}
+      </div>
+
       <Sheet
         open={openCreateProductsDialog}
         onOpenChange={() => {
@@ -136,6 +278,7 @@ function AdminProducts() {
               {currentEditedId !== null ? "Edit Product" : "Add New Product"}
             </SheetTitle>
           </SheetHeader>
+
           <ProductImageUpload
             imageFile={imageFile}
             setImageFile={setImageFile}
@@ -145,13 +288,14 @@ function AdminProducts() {
             imageLoadingState={imageLoadingState}
             isEditMode={currentEditedId !== null}
           />
+
           <div className="py-6">
             <CommonForm
               onSubmit={onSubmit}
               formData={formData}
               setFormData={setFormData}
               buttonText={currentEditedId !== null ? "Edit" : "Add"}
-              formControls={addProductFormElements}
+              formControls={modifiedFormControls}
               isBtnDisabled={!isFormValid()}
             />
           </div>

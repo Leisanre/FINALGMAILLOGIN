@@ -7,10 +7,14 @@ const ProductSchema = new mongoose.Schema(
     description: String,
     category: String,
     brand: String,
+    genre: String,
     price: Number,
     salePrice: Number,
     totalStock: Number,
-    averageReview: Number,
+    averageReview: {
+      type: Number,
+      default: 0,
+    },
   },
   { timestamps: true }
 );
