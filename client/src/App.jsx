@@ -16,9 +16,9 @@ import ShoppingAccount from "./pages/shopping-view/account";
 import CheckAuth from "./components/common/check-auth";
 import UnauthPage from "./pages/unauth-page";
 import { useDispatch, useSelector } from "react-redux";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { checkAuth } from "./store/auth-slice";
-import { Skeleton } from "@/components/ui/skeleton";
+import { Progress } from "@/components/ui/progress";
 import PaypalReturnPage from "./pages/shopping-view/paypal-return";
 import PaymentSuccessPage from "./pages/shopping-view/payment-success";
 import SearchProducts from "./pages/shopping-view/search";
@@ -28,12 +28,95 @@ function App() {
     (state) => state.auth
   );
   const dispatch = useDispatch();
+  const [progressValue, setProgressValue] = useState(0);
+  const [showLoading, setShowLoading] = useState(true);
+  const [delayedAuth, setDelayedAuth] = useState({
+    isAuthenticated: false,
+    user: null,
+    isLoading: true
+  });
 
   useEffect(() => {
     dispatch(checkAuth());
   }, [dispatch]);
 
-  if (isLoading) return <Skeleton className="w-[800] bg-black h-[600px]" />;
+  // Control the delayed authentication state for 3-second minimum loading
+  useEffect(() => {
+    if (!isLoading && isAuthenticated && user) {
+      // User successfully authenticated, show loading for 3 seconds
+      setShowLoading(true);
+      const delayTimer = setTimeout(() => {
+        setDelayedAuth({
+          isAuthenticated,
+          user,
+          isLoading: false
+        });
+        setShowLoading(false);
+      }, 2000);
+
+      return () => clearTimeout(delayTimer);
+    } else if (!isLoading && !isAuthenticated) {
+      // Not authenticated, hide loading immediately
+      setDelayedAuth({
+        isAuthenticated: false,
+        user: null,
+        isLoading: false
+      });
+      setShowLoading(false);
+    }
+  }, [isLoading, isAuthenticated, user]);
+
+  // Animate progress bar when loading
+  useEffect(() => {
+    if (showLoading) {
+      setProgressValue(0);
+      
+      // First stage: gradually increase to 30 over 1 second
+      const interval1 = setInterval(() => {
+        setProgressValue(prev => {
+          if (prev < 30) {
+            return prev + 1;
+          }
+          clearInterval(interval1);
+          return prev;
+        });
+      }, 33); // Update every 33ms (30 updates * 33ms = ~1 second)
+
+      // Second stage: wait then go to 100
+      const timer2 = setTimeout(() => {
+        const interval2 = setInterval(() => {
+          setProgressValue(prev => {
+            if (prev < 100) {
+              return prev + 2;
+            }
+            clearInterval(interval2);
+            return prev;
+          });
+        }, 20); // Faster animation for second stage (35 updates * 20ms = 0.7 seconds)
+      }, 1200); // Wait 1.2 seconds before second stage
+
+      return () => {
+        clearInterval(interval1);
+        clearTimeout(timer2);
+      };
+    } else {
+      setProgressValue(0);
+    }
+  }, [showLoading]);
+
+  if (showLoading) {
+    return (
+      <div className="flex flex-col items-center justify-center min-h-screen bg-background p-4">
+        <div className="w-full max-w-md space-y-4">
+          <div className="text-center">
+            <h2 className="text-lg font-semibold text-foreground">Loading...</h2>
+            <p className="text-sm text-muted-foreground">Please wait while we verify your authentication</p>
+          </div>
+          <Progress value={progressValue} className="w-full" />
+        </div>
+      </div>
+    );
+  }
 
   console.log(isLoading, user);
 
@@ -44,15 +127,15 @@ function App() {
           path="/"
           element={
             <CheckAuth
-              isAuthenticated={isAuthenticated}
-              user={user}
+              isAuthenticated={delayedAuth.isAuthenticated}
+              user={delayedAuth.user}
             ></CheckAuth>
           }
         />
         <Route
           path="/auth"
           element={
-            <CheckAuth isAuthenticated={isAuthenticated} user={user}>
+            <CheckAuth isAuthenticated={delayedAuth.isAuthenticated} user={delayedAuth.user}>
               <AuthLayout />
             </CheckAuth>
           }
@@ -63,7 +146,7 @@ function App() {
         <Route
           path="/admin"
           element={
-            <CheckAuth isAuthenticated={isAuthenticated} user={user}>
+            <CheckAuth isAuthenticated={delayedAuth.isAuthenticated} user={delayedAuth.user}>
               <AdminLayout />
             </CheckAuth>
           }
@@ -76,7 +159,7 @@ function App() {
         <Route
           path="/shop"
           element={
-            <CheckAuth isAuthenticated={isAuthenticated} user={user}>
+            <CheckAuth isAuthenticated={delayedAuth.isAuthenticated} user={delayedAuth.user}>
               <ShoppingLayout />
             </CheckAuth>
           }

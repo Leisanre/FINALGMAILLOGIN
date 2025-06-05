@@ -25,7 +25,9 @@ function ProductImageUpload({
     const selectedFile = event.target.files?.[0];
     console.log(selectedFile);
 
-    if (selectedFile) setImageFile(selectedFile);
+    if (selectedFile && validateImageFile(selectedFile)) {
+      setImageFile(selectedFile);
+    }
   }
 
   function handleDragOver(event) {
@@ -35,11 +37,38 @@ function ProductImageUpload({
   function handleDrop(event) {
     event.preventDefault();
     const droppedFile = event.dataTransfer.files?.[0];
-    if (droppedFile) setImageFile(droppedFile);
+    if (droppedFile && validateImageFile(droppedFile)) {
+      setImageFile(droppedFile);
+    }
+  }
+
+  function validateImageFile(file) {
+    // Check if file exists and has content
+    if (!file || file.size === 0) {
+      console.error("File is empty or does not exist");
+      return false;
+    }
+
+    // Check file type
+    const allowedTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/gif', 'image/webp'];
+    if (!allowedTypes.includes(file.type)) {
+      console.error("File type not allowed. Please select a valid image file.");
+      return false;
+    }
+
+    // Check file size (limit to 5MB)
+    const maxSize = 5 * 1024 * 1024; // 5MB in bytes
+    if (file.size > maxSize) {
+      console.error("File size too large. Please select an image smaller than 5MB.");
+      return false;
+    }
+
+    return true;
   }
 
   function handleRemoveImage() {
     setImageFile(null);
+    setUploadedImageUrl("");
     if (inputRef.current) {
       inputRef.current.value = "";
     }
@@ -80,6 +109,7 @@ function ProductImageUpload({
         <Input
           id="image-upload"
           type="file"
+          accept="image/*"
           className="hidden"
           ref={inputRef}
           onChange={handleImageFileChange}

@@ -98,9 +98,14 @@ function AdminProducts() {
   }
 
   function isFormValid() {
-    return Object.keys(formData)
+    const isFormDataValid = Object.keys(formData)
       .filter((key) => key !== "averageReview")
       .every((key) => formData[key] !== "");
+    
+    // For new products, require an uploaded image. For edits, image is optional
+    const isImageValid = currentEditedId !== null || (imageFile && uploadedImageUrl);
+    
+    return isFormDataValid && isImageValid;
   }
 
   function handleAddItem(e, value, setter, action, getAction, name) {

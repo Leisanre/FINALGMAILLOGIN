@@ -20,6 +20,11 @@ export const addFeatureImage = createAsyncThunk("common/addFeatureImage", async 
   return response.data;
 });
 
+export const deleteFeatureImage = createAsyncThunk("common/deleteFeatureImage", async (id) => {
+  const response = await axios.delete(`http://localhost:5000/api/common/feature/delete/${id}`);
+  return response.data;
+});
+
 export const getGenres = createAsyncThunk("common/getGenres", async () => {
   const response = await axios.get("http://localhost:5000/api/genres");
   return response.data;
@@ -84,6 +89,13 @@ extraReducers: (builder) => {
     .addCase(getFeatureImages.rejected, (state) => {
       state.isLoading = false;
       state.featureImageList = [];
+    })
+    .addCase(addFeatureImage.fulfilled, (state, action) => {
+      state.featureImageList.push(action.payload.data);
+    })
+    .addCase(deleteFeatureImage.fulfilled, (state, action) => {
+      const deletedId = action.meta.arg;
+      state.featureImageList = state.featureImageList.filter((img) => img._id !== deletedId);
     })
 
     // GENRE
