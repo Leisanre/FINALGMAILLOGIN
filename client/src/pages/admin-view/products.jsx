@@ -8,6 +8,14 @@ import {
   SheetHeader,
   SheetTitle,
 } from "@/components/ui/sheet";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
 import { useToast } from "@/components/ui/use-toast";
 import { addProductFormElements } from "@/config";
 import {
@@ -53,6 +61,8 @@ function AdminProducts() {
   const [newGenre, setNewGenre] = useState("");
   const [newCategory, setNewCategory] = useState("");
   const [newBrand, setNewBrand] = useState("");
+  const [showDeleteDialog, setShowDeleteDialog] = useState(false);
+  const [productToDelete, setProductToDelete] = useState(null);
 
   const { productList } = useSelector((state) => state.adminProducts);
   // Make sure the slice name here matches your store setup (commonSlice or commonFeature)
@@ -89,12 +99,34 @@ function AdminProducts() {
     }
   }
 
-  function handleDelete(getCurrentProductId) {
-    dispatch(deleteProduct(getCurrentProductId)).then((data) => {
-      if (data?.payload?.success) {
-        dispatch(fetchAllProducts());
-      }
-    });
+  function handleDeleteClick(getCurrentProductId) {
+    setProductToDelete(getCurrentProductId);
+    setShowDeleteDialog(true);
+  }
+
+  function handleConfirmDelete() {
+    if (productToDelete) {
+      dispatch(deleteProduct(productToDelete)).then((data) => {
+        if (data?.payload?.success) {
+          dispatch(fetchAllProducts());
+          toast({
+            title: "Product deleted successfully!",
+          });
+        } else {
+          toast({
+            title: "Failed to delete product. Please try again.",
+            variant: "destructive",
+          });
+        }
+      });
+    }
+    setShowDeleteDialog(false);
+    setProductToDelete(null);
+  }
+
+  function handleCancelDelete() {
+    setShowDeleteDialog(false);
+    setProductToDelete(null);
   }
 
   function isFormValid() {
@@ -169,7 +201,7 @@ function AdminProducts() {
               setOpenCreateProductsDialog={setOpenCreateProductsDialog}
               setCurrentEditedId={setCurrentEditedId}
               product={productItem}
-              handleDelete={handleDelete}
+              handleDelete={handleDeleteClick}
             />
           ))}
       </div>
@@ -306,6 +338,32 @@ function AdminProducts() {
           </div>
         </SheetContent>
       </Sheet>
+
+      {/* Delete Confirmation Dialog */}
+      <Dialog open={showDeleteDialog} onOpenChange={setShowDeleteDialog}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Delete Product</DialogTitle>
+            <DialogDescription>
+              Are you sure you want to delete this product? This action cannot be undone.
+            </DialogDescription>
+          </DialogHeader>
+          <DialogFooter>
+            <Button
+              variant="outline"
+              onClick={handleCancelDelete}
+            >
+              Cancel
+            </Button>
+            <Button
+              variant="destructive"
+              onClick={handleConfirmDelete}
+            >
+              Delete
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </Fragment>
   );
 }
