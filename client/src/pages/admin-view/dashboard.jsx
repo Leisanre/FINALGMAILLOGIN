@@ -20,8 +20,17 @@ import {
   CardContent,
   CardTitle,
 } from "@/components/ui/card";
-import { addFeatureImage, getFeatureImages } from "@/store/common-slice";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
+import { addFeatureImage, getFeatureImages, deleteFeatureImage } from "@/store/common-slice";
 import { useDispatch, useSelector } from "react-redux";
+import { useToast } from "@/components/ui/use-toast";
 
 ChartJS.register(
   CategoryScale,
@@ -105,29 +114,91 @@ export default function AdminDashboard() {
   const [imageFile, setImageFile] = useState(null);
   const [uploadedImageUrl, setUploadedImageUrl] = useState("");
   const [imageLoadingState, setImageLoadingState] = useState(false);
+  const [showDeleteDialog, setShowDeleteDialog] = useState(false);
+  const [imageToDelete, setImageToDelete] = useState(null);
   const dispatch = useDispatch();
+  const { toast } = useToast();
   const { featureImageList } = useSelector((state) => state.commonFeature);
 
   const handleAddItem = async (e) => {
     e.preventDefault();
     try {
       await dispatch(addFeatureImage(itemName));
-      alert(`${itemType.charAt(0).toUpperCase() + itemType.slice(1)} added!`);
+      toast({
+        title: `${itemType.charAt(0).toUpperCase() + itemType.slice(1)} added successfully!`,
+      });
       setItemName("");
     } catch (err) {
       console.error(err);
-      alert(`Error adding ${itemType}`);
+      toast({
+        title: `Error adding ${itemType}`,
+        variant: "destructive",
+      });
     }
   };
 
   const handleUploadFeatureImage = () => {
-    dispatch(addFeatureImage(uploadedImageUrl)).then((data) => {
-      if (data?.payload?.success) {
-        dispatch(getFeatureImages());
-        setImageFile(null);
-        setUploadedImageUrl("");
-      }
-    });
+    if (uploadedImageUrl && uploadedImageUrl.trim() !== "") {
+      dispatch(addFeatureImage(uploadedImageUrl)).then((data) => {
+        if (data?.payload?.success) {
+          dispatch(getFeatureImages());
+          setImageFile(null);
+          setUploadedImageUrl("");
+          toast({
+            title: "Feature image uploaded successfully!",
+          });
+        } else {
+          toast({
+            title: "Failed to upload image. Please try again.",
+            variant: "destructive",
+          });
+        }
+      });
+    } else {
+      toast({
+        title: "Please select and upload an image first!",
+        variant: "destructive",
+      });
+    }
+  };
+
+  const handleDeleteClick = (image) => {
+    console.log("Image to delete:", image); // Debug log
+    setImageToDelete(image);
+    setShowDeleteDialog(true);
+  };
+
+  const handleConfirmDelete = () => {
+    if (imageToDelete) {
+      dispatch(deleteFeatureImage(imageToDelete._id)).then((data) => {
+        console.log("Delete response:", data); // Debug log
+        if (data?.payload?.success) {
+          dispatch(getFeatureImages());
+          toast({
+            title: "Feature image deleted successfully!",
+          });
+        } else {
+          console.error("Delete failed:", data); // Debug log
+          toast({
+            title: `Failed to delete image: ${data?.payload?.message || 'Please try again.'}`,
+            variant: "destructive",
+          });
+        }
+      }).catch((error) => {
+        console.error("Delete error:", error); // Debug log
+        toast({
+          title: "Network error occurred while deleting image.",
+          variant: "destructive",
+        });
+      });
+    }
+    setShowDeleteDialog(false);
+    setImageToDelete(null);
+  };
+
+  const handleCancelDelete = () => {
+    setShowDeleteDialog(false);
+    setImageToDelete(null);
   };
 
   useEffect(() => {
@@ -249,8 +320,12 @@ export default function AdminDashboard() {
           imageLoadingState={imageLoadingState}
           isCustomStyling
         />
-        <Button onClick={handleUploadFeatureImage} className="w-full bg-blue-600 hover:bg-blue-700">
-          Upload
+        <Button
+          onClick={handleUploadFeatureImage}
+          className="w-full bg-blue-600 hover:bg-blue-700"
+          disabled={imageLoadingState || !imageFile || !uploadedImageUrl}
+        >
+          {imageLoadingState ? "Uploading..." : "Upload"}
         </Button>
         {featureImageList?.length > 0 && (
           <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
@@ -263,7 +338,7 @@ export default function AdminDashboard() {
                 />
                 <div className="absolute inset-0 bg-black bg-opacity-50 opacity-0 group-hover:opacity-100 flex items-center justify-center transition-opacity">
                   <Button
-                    onClick={() => alert("Delete functionality coming soon")}
+                    onClick={() => handleDeleteClick(featureImgItem)}
                     className="bg-red-600 hover:bg-red-700 text-white"
                   >
                     Delete
@@ -274,6 +349,32 @@ export default function AdminDashboard() {
           </div>
         )}
       </div>
+
+      {/* Delete Confirmation Dialog */}
+      <Dialog open={showDeleteDialog} onOpenChange={setShowDeleteDialog}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Delete Feature Image</DialogTitle>
+            <DialogDescription>
+              Are you sure you want to delete this feature image? This action cannot be undone.
+            </DialogDescription>
+          </DialogHeader>
+          <DialogFooter>
+            <Button
+              variant="outline"
+              onClick={handleCancelDelete}
+            >
+              Cancel
+            </Button>
+            <Button
+              variant="destructive"
+              onClick={handleConfirmDelete}
+            >
+              Delete
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
