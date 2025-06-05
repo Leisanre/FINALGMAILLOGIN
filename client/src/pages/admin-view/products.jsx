@@ -63,6 +63,8 @@ function AdminProducts() {
   const [newBrand, setNewBrand] = useState("");
   const [showDeleteDialog, setShowDeleteDialog] = useState(false);
   const [productToDelete, setProductToDelete] = useState(null);
+  const [showItemDeleteDialog, setShowItemDeleteDialog] = useState(false);
+  const [itemToDelete, setItemToDelete] = useState(null);
 
   const { productList } = useSelector((state) => state.adminProducts);
   // Make sure the slice name here matches your store setup (commonSlice or commonFeature)
@@ -129,6 +131,35 @@ function AdminProducts() {
     setProductToDelete(null);
   }
 
+  function handleItemDeleteClick(item, deleteAction, getAction, label) {
+    setItemToDelete({ item, deleteAction, getAction, label });
+    setShowItemDeleteDialog(true);
+  }
+
+  function handleConfirmItemDelete() {
+    if (itemToDelete) {
+      const { item, deleteAction, getAction, label } = itemToDelete;
+      dispatch(deleteAction(item._id || item)).then((data) => {
+        if (data?.payload?.success) {
+          toast({ title: `${label} deleted successfully` });
+          dispatch(getAction());
+        } else {
+          toast({
+            title: `Failed to delete ${label}`,
+            variant: "destructive",
+          });
+        }
+      });
+    }
+    setShowItemDeleteDialog(false);
+    setItemToDelete(null);
+  }
+
+  function handleCancelItemDelete() {
+    setShowItemDeleteDialog(false);
+    setItemToDelete(null);
+  }
+
   function isFormValid() {
     const isFormDataValid = Object.keys(formData)
       .filter((key) => key !== "averageReview")
@@ -174,8 +205,8 @@ function AdminProducts() {
         ...field,
         type: "select",
         options: list.map((item) => ({
+          id: item.name || item,
           label: item.name || item,
-          value: item.name || item,
         })),
       };
     }
@@ -274,19 +305,7 @@ function AdminProducts() {
                     <li key={item._id || item} className="flex justify-between items-center">
                       <span>{item.name || item}</span>
                       <button
-                        onClick={() => {
-                          dispatch(deleteAction(item._id || item)).then((data) => {
-                            if (data?.payload?.success) {
-                              toast({ title: `${label} deleted successfully` });
-                              dispatch(getAction());
-                            } else {
-                              toast({
-                                title: `Failed to delete ${label}`,
-                                variant: "destructive",
-                              });
-                            }
-                          });
-                        }}
+                        onClick={() => handleItemDeleteClick(item, deleteAction, getAction, label)}
                         className="ml-2 text-red-600 hover:underline"
                         type="button"
                       >
@@ -358,6 +377,32 @@ function AdminProducts() {
             <Button
               variant="destructive"
               onClick={handleConfirmDelete}
+            >
+              Delete
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* Item Delete Confirmation Dialog */}
+      <Dialog open={showItemDeleteDialog} onOpenChange={setShowItemDeleteDialog}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Delete {itemToDelete?.label}</DialogTitle>
+            <DialogDescription>
+              Are you sure you want to delete this {itemToDelete?.label?.toLowerCase()}? This action cannot be undone.
+            </DialogDescription>
+          </DialogHeader>
+          <DialogFooter>
+            <Button
+              variant="outline"
+              onClick={handleCancelItemDelete}
+            >
+              Cancel
+            </Button>
+            <Button
+              variant="destructive"
+              onClick={handleConfirmItemDelete}
             >
               Delete
             </Button>

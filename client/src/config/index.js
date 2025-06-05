@@ -79,6 +79,19 @@ export const addProductFormElements = [
     ],
   },
   {
+    label: "Genre",
+    name: "genre",
+    componentType: "select",
+    options: [
+      { id: "fiction", label: "Fiction" },
+      { id: "non-fiction", label: "Non-Fiction" },
+      { id: "romance", label: "Romance" },
+      { id: "mystery", label: "Mystery" },
+      { id: "sci-fi", label: "Sci-Fi" },
+      { id: "fantasy", label: "Fantasy" },
+    ],
+  },
+  {
     label: "Price",
     name: "price",
     componentType: "input",
