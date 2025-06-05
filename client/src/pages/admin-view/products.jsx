@@ -162,7 +162,7 @@ function AdminProducts() {
 
   function isFormValid() {
     const isFormDataValid = Object.keys(formData)
-      .filter((key) => key !== "averageReview")
+      .filter((key) => key !== "averageReview" && key !== "salePrice")
       .every((key) => formData[key] !== "");
     
     // For new products, require an uploaded image. For edits, image is optional
@@ -215,29 +215,18 @@ function AdminProducts() {
 
   return (
     <Fragment>
-      <div className="mb-6 flex justify-between items-center">
-        <h1 className="text-2xl font-bold">Products</h1>
-        <Button onClick={() => setOpenCreateProductsDialog(true)}>
-          Add New Product
-        </Button>
+      {/* Fixed Header */}
+      <div className="sticky top-0 bg-white/95 backdrop-blur-sm border-b border-gray-200 z-20 p-4 mb-6">
+        <div className="flex justify-between items-center">
+          <h1 className="text-2xl font-bold">Products</h1>
+          <Button onClick={() => setOpenCreateProductsDialog(true)}>
+            Add New Product
+          </Button>
+        </div>
       </div>
 
-      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
-        {productList &&
-          productList.length > 0 &&
-          productList.map((productItem) => (
-            <AdminProductTile
-              key={productItem.id}
-              setFormData={setFormData}
-              setOpenCreateProductsDialog={setOpenCreateProductsDialog}
-              setCurrentEditedId={setCurrentEditedId}
-              product={productItem}
-              handleDelete={handleDeleteClick}
-            />
-          ))}
-      </div>
-
-      <div className="mt-12 grid gap-8 md:grid-cols-2 lg:grid-cols-3">
+      {/* Management Sections */}
+      <div className="mb-12 grid gap-8 md:grid-cols-2 lg:grid-cols-3">
         {[
           {
             label: "Genre",
@@ -318,6 +307,22 @@ function AdminProducts() {
             </div>
           )
         )}
+      </div>
+
+      {/* Product Grid */}
+      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+        {productList &&
+          productList.length > 0 &&
+          productList.map((productItem) => (
+            <AdminProductTile
+              key={productItem.id}
+              setFormData={setFormData}
+              setOpenCreateProductsDialog={setOpenCreateProductsDialog}
+              setCurrentEditedId={setCurrentEditedId}
+              product={productItem}
+              handleDelete={handleDeleteClick}
+            />
+          ))}
       </div>
 
       <Sheet
