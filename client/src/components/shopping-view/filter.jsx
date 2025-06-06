@@ -1,7 +1,13 @@
 import { Fragment, useEffect, useState } from "react";
 import { Label } from "../ui/label";
-import { Checkbox } from "../ui/checkbox";
 import { Separator } from "../ui/separator";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "../ui/select";
 import axios from "axios";
 
 function ProductFilter({ filters, handleFilter }) {
@@ -42,6 +48,24 @@ function ProductFilter({ filters, handleFilter }) {
     fetchFilterOptions();
   }, []);
 
+  const handleDropdownChange = (keyItem, value) => {
+    if (value === "all") {
+      // Clear the filter for this category
+      handleFilter(keyItem, null, true);
+    } else {
+      // Set single selection for this category
+      handleFilter(keyItem, value, false, true);
+    }
+  };
+
+  const getSelectedValue = (keyItem) => {
+    const filterValues = filters?.[keyItem];
+    if (!filterValues || filterValues.length === 0) {
+      return "all";
+    }
+    return filterValues[0]; // Return first selected value for single selection
+  };
+
   return (
     <div className="bg-background rounded-lg shadow-sm">
       <div className="p-4 border-b">
@@ -51,25 +75,25 @@ function ProductFilter({ filters, handleFilter }) {
         {Object.keys(dynamicFilters).map((keyItem) => (
           <Fragment key={keyItem}>
             <div>
-              <h3 className="text-base font-bold capitalize">{keyItem === 'brand' ? 'Type' : keyItem}</h3>
-              <div className="grid gap-2 mt-2">
-                {dynamicFilters[keyItem].map((option) => (
-                  <Label
-                    key={option.id}
-                    className="flex font-medium items-center gap-2"
-                  >
-                    <Checkbox
-                      checked={
-                        filters?.[keyItem]?.includes(option.id) || false
-                      }
-                      onCheckedChange={() =>
-                        handleFilter(keyItem, option.id)
-                      }
-                    />
-                    {option.label}
-                  </Label>
-                ))}
-              </div>
+              <Label className="text-base font-bold capitalize mb-2 block">
+                {keyItem === 'brand' ? 'Type' : keyItem}
+              </Label>
+              <Select
+                value={getSelectedValue(keyItem)}
+                onValueChange={(value) => handleDropdownChange(keyItem, value)}
+              >
+                <SelectTrigger className="w-full">
+                  <SelectValue placeholder={`Select ${keyItem === 'brand' ? 'Type' : keyItem}`} />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">All {keyItem === 'brand' ? 'Types' : `${keyItem}s`}</SelectItem>
+                  {dynamicFilters[keyItem].map((option) => (
+                    <SelectItem key={option.id} value={option.id}>
+                      {option.label}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
             </div>
             <Separator />
           </Fragment>
