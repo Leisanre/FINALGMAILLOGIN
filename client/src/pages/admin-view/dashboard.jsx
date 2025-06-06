@@ -222,31 +222,12 @@ export default function AdminDashboard() {
     ],
   };
 
-  const [itemType, setItemType] = useState("category");
-  const [itemName, setItemName] = useState("");
   const [imageFile, setImageFile] = useState(null);
   const [uploadedImageUrl, setUploadedImageUrl] = useState("");
   const [imageLoadingState, setImageLoadingState] = useState(false);
   const [showDeleteDialog, setShowDeleteDialog] = useState(false);
   const [imageToDelete, setImageToDelete] = useState(null);
   const { toast } = useToast();
-
-  const handleAddItem = async (e) => {
-    e.preventDefault();
-    try {
-      await dispatch(addFeatureImage(itemName));
-      toast({
-        title: `${itemType.charAt(0).toUpperCase() + itemType.slice(1)} added successfully!`,
-      });
-      setItemName("");
-    } catch (err) {
-      console.error(err);
-      toast({
-        title: `Error adding ${itemType}`,
-        variant: "destructive",
-      });
-    }
-  };
 
   const handleUploadFeatureImage = () => {
     if (uploadedImageUrl && uploadedImageUrl.trim() !== "") {
@@ -463,40 +444,6 @@ export default function AdminDashboard() {
           </CardContent>
         </Card>
       </div>
-
-      {/* Add Item Form */}
-      <Card className="bg-blue-600 text-white">
-        <CardHeader className="p-3 sm:p-4 lg:p-6">
-          <CardTitle className="text-base sm:text-lg lg:text-xl">Add Category, Brand, or Genre</CardTitle>
-        </CardHeader>
-        <CardContent className="p-3 sm:p-4 lg:p-6 pt-0">
-          <form onSubmit={handleAddItem} className="flex flex-col sm:flex-row gap-3 sm:gap-4">
-            <select
-              value={itemType}
-              onChange={(e) => setItemType(e.target.value)}
-              className="p-2 sm:p-3 rounded-md text-black w-full sm:w-32 md:w-40 focus:outline-none text-sm sm:text-base"
-            >
-              <option value="category">Category</option>
-              <option value="brand">Brand</option>
-              <option value="genre">Genre</option>
-            </select>
-            <input
-              type="text"
-              placeholder={`Enter ${itemType} name`}
-              value={itemName}
-              onChange={(e) => setItemName(e.target.value)}
-              required
-              className="flex-1 p-2 sm:p-3 rounded-md text-black focus:outline-none text-sm sm:text-base"
-            />
-            <button
-              type="submit"
-              className="bg-white text-blue-600 font-semibold px-4 sm:px-6 py-2 sm:py-3 rounded-md hover:bg-blue-100 transition-colors text-sm sm:text-base whitespace-nowrap"
-            >
-              Add
-            </button>
-          </form>
-        </CardContent>
-      </Card>
 
       {/* Image Upload Section */}
       <Card>
