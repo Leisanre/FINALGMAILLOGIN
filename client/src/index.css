@@ -165,6 +165,45 @@
     grid-template-columns: repeat(auto-fill, minmax(min(100%, 200px), 1fr));
     gap: 1rem;
   }
+  
+  /* Product tile specific responsive utilities */
+  .product-tile-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(min(100%, 240px), 1fr));
+    gap: 0.75rem;
+  }
+  
+  @media (min-width: 640px) {
+    .product-tile-grid {
+      grid-template-columns: repeat(auto-fill, minmax(min(100%, 220px), 1fr));
+      gap: 1rem;
+    }
+  }
+  
+  @media (min-width: 768px) {
+    .product-tile-grid {
+      grid-template-columns: repeat(auto-fill, minmax(min(100%, 200px), 1fr));
+      gap: 1.25rem;
+    }
+  }
+  
+  @media (min-width: 1024px) {
+    .product-tile-grid {
+      grid-template-columns: repeat(auto-fill, minmax(min(100%, 220px), 1fr));
+      gap: 1.5rem;
+    }
+  }
+  
+  /* Enhanced responsive image behavior */
+  .responsive-product-image {
+    aspect-ratio: 4/3;
+    object-fit: cover;
+    transition: transform 0.3s ease-in-out;
+  }
+  
+  .responsive-product-image:hover {
+    transform: scale(1.05);
+  }
 }
 
 /* Container responsive behavior */

@@ -239,7 +239,7 @@ function ShoppingHome() {
           <h2 className="text-lg xs:text-xl sm:text-2xl md:text-3xl font-bold text-center mb-4 xs:mb-6 sm:mb-8">
             Feature Products
           </h2>
-          <div className="grid grid-cols-1 xs:grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3 xs:gap-4 sm:gap-6">
+          <div className="product-tile-grid">
             {productList && productList.length > 0
               ? productList.map((productItem) => (
                   <ShoppingProductTile

@@ -10,12 +10,14 @@ function ProductFilter({ filters, handleFilter }) {
   useEffect(() => {
   const fetchFilterOptions = async () => {
     try {
-      const [brandRes, categoryRes] = await Promise.all([
+      const [brandRes, categoryRes, genreRes] = await Promise.all([
         axios.get("/api/brands"),
         axios.get("/api/categories"),
+        axios.get("/api/genres"),
     ]);
     console.log("BRANDS", brandRes);
     console.log("CATEGORIES", categoryRes);
+    console.log("GENRES", genreRes);
 
 
         setDynamicFilters({
@@ -26,6 +28,10 @@ function ProductFilter({ filters, handleFilter }) {
           category: categoryRes.data.data.map((c) => ({
             id: c._id,
             label: c.name,
+          })),
+          genre: genreRes.data.data.map((g) => ({
+            id: g._id,
+            label: g.name,
           })),
         });
       } catch (err) {
