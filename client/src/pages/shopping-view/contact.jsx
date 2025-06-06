@@ -27,40 +27,15 @@ function ShoppingContact() {
     subject: '',
     message: ''
   });
+  const [errors, setErrors] = useState({});
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isSubmitted, setIsSubmitted] = useState(false);
 
   const contactMethods = [
-    {
-      icon: Mail,
-      title: "Email Us",
-      description: "Send us an email about book recommendations or inquiries",
-      contact: "info@booksale.com",
-      color: "text-blue-500",
-      bgColor: "bg-blue-50"
-    },
-    {
-      icon: Phone,
-      title: "Call Us",
-      description: "Speak with our book experts and customer service team",
-      contact: "+1 (555) 123-4567",
-      color: "text-green-500",
-      bgColor: "bg-green-50"
-    },
-    {
-      icon: Facebook,
-      title: "Facebook",
-      description: "Follow us for book recommendations and updates",
-      contact: "@BookSaleStore",
-      color: "text-blue-600",
-      bgColor: "bg-blue-50"
-    },
-    {
-      icon: Linkedin,
-      title: "LinkedIn",
-      description: "Connect with us for business and educational resources",
-      contact: "@BookSaleBusiness",
-      color: "text-blue-700",
-      bgColor: "bg-blue-50"
-    }
+    { icon: Mail, title: "Email Us", description: "Send us an email about book recommendations or inquiries", contact: "info@booksale.com", color: "text-blue-500", bgColor: "bg-blue-50" },
+    { icon: Phone, title: "Call Us", description: "Speak with our book experts and customer service team", contact: "+1 (555) 123-4567", color: "text-green-500", bgColor: "bg-green-50" },
+    { icon: Facebook, title: "Facebook", description: "Follow us for book recommendations and updates", contact: "@BookSaleStore", color: "text-blue-600", bgColor: "bg-blue-50" },
+    { icon: Linkedin, title: "LinkedIn", description: "Connect with us for business and educational resources", contact: "@BookSaleBusiness", color: "text-blue-700", bgColor: "bg-blue-50" }
   ];
 
   const officeHours = [
@@ -85,10 +60,32 @@ function ShoppingContact() {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    // Handle form submission here
-    console.log("Form submitted:", formData);
-    // Reset form
-    setFormData({ name: '', email: '', subject: '', message: '' });
+    setIsSubmitting(true);
+    setErrors({}); // Reset errors before validation
+
+    // Simple form validation
+    const newErrors = {};
+    if (!formData.name) newErrors.name = "Name is required";
+    if (!formData.email) {
+      newErrors.email = "Email is required";
+    } else if (!/\S+@\S+\.\S+/.test(formData.email)) {
+      newErrors.email = "Email is invalid";
+    }
+    if (!formData.subject) newErrors.subject = "Subject is required";
+    if (!formData.message) newErrors.message = "Message is required";
+
+    if (Object.keys(newErrors).length > 0) {
+      setErrors(newErrors);
+      setIsSubmitting(false);
+      return;
+    }
+
+    // Simulate form submission
+    setTimeout(() => {
+      setIsSubmitting(false);
+      setIsSubmitted(true);
+      setFormData({ name: '', email: '', subject: '', message: '' });
+    }, 2000); // Simulating a delay for submission
   };
 
   return (
@@ -173,6 +170,7 @@ function ShoppingContact() {
                         placeholder="Enter your full name"
                         className="w-full"
                       />
+                      {errors.name && <p className="text-red-500 text-xs mt-1">{errors.name}</p>}
                     </div>
                     <div>
                       <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-2">
@@ -188,6 +186,7 @@ function ShoppingContact() {
                         placeholder="Enter your email"
                         className="w-full"
                       />
+                      {errors.email && <p className="text-red-500 text-xs mt-1">{errors.email}</p>}
                     </div>
                   </div>
                   <div>
@@ -204,6 +203,7 @@ function ShoppingContact() {
                       placeholder="What is this regarding?"
                       className="w-full"
                     />
+                    {errors.subject && <p className="text-red-500 text-xs mt-1">{errors.subject}</p>}
                   </div>
                   <div>
                     <label htmlFor="message" className="block text-sm font-medium text-gray-700 mb-2">
@@ -219,12 +219,13 @@ function ShoppingContact() {
                       rows={5}
                       className="w-full"
                     />
+                    {errors.message && <p className="text-red-500 text-xs mt-1">{errors.message}</p>}
                   </div>
-                  <Button type="submit" className="w-full bg-blue-600 hover:bg-blue-700">
-                    <Send className="w-4 h-4 mr-2" />
-                    Send Message
+                  <Button type="submit" className="w-full bg-blue-600 hover:bg-blue-700" disabled={isSubmitting}>
+                    {isSubmitting ? "Sending..." : <><Send className="w-4 h-4 mr-2" />Send Message</>}
                   </Button>
                 </form>
+                {isSubmitted && <p className="text-green-500 mt-4">Your message has been sent! We will get back to you soon.</p>}
               </CardContent>
             </Card>
 
@@ -292,7 +293,7 @@ function ShoppingContact() {
                         aria-label={social.label}
                         className={`p-3 bg-gray-100 rounded-lg text-gray-600 ${social.color} transition-colors hover:bg-gray-200`}
                       >
-                        <social.icon className="w-5 h-5" />
+                        <social.icon className="w-6 h-6" />
                       </a>
                     ))}
                   </div>
