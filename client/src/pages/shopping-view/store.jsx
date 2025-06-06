@@ -250,30 +250,6 @@ function ShoppingStore() {
         </div>
       </section>
 
-      {/* Visit Us CTA */}
-      <section className="py-12 md:py-16 bg-primary text-white">
-        <div className="container mx-auto px-4">
-          <div className="text-center max-w-4xl mx-auto">
-            <h2 className="text-2xl md:text-3xl font-bold mb-4">
-              Visit BookSale Today
-            </h2>
-            <p className="text-lg md:text-xl leading-relaxed opacity-90 mb-8">
-              Discover thousands of books, get personalized recommendations from our book experts,
-              and enjoy the cozy atmosphere of reading in our comfortable bookstore spaces.
-            </p>
-            <div className="flex flex-col sm:flex-row gap-4 justify-center">
-              <Button size="lg" variant="secondary">
-                <MapPin className="w-5 h-5 mr-2" />
-                Find Nearest BookSale
-              </Button>
-              <Button size="lg" variant="outline" className="border-white text-white hover:bg-white hover:text-primary">
-                <ShoppingBag className="w-5 h-5 mr-2" />
-                Browse Books Online
-              </Button>
-            </div>
-          </div>
-        </div>
-      </section>
     </div>
   );
 }
