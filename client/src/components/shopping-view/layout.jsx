@@ -1,6 +1,7 @@
 import { Outlet } from "react-router-dom";
 import { useEffect } from "react";
 import ShoppingHeader from "./header";
+import ShoppingFooter from "./footer";
 
 function ShoppingLayout() {
   useEffect(() => {
@@ -15,12 +16,14 @@ function ShoppingLayout() {
   }, []);
 
   return (
-    <div className="flex flex-col bg-white overflow-hidden">
+    <div className="flex flex-col min-h-screen bg-white overflow-hidden">
       {/* common header */}
       <ShoppingHeader />
-      <main className="flex flex-col w-full">
+      <main className="flex flex-col w-full flex-1">
         <Outlet />
       </main>
+      {/* common footer */}
+      <ShoppingFooter />
     </div>
   );
 }
