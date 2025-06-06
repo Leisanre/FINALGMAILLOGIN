@@ -1,7 +1,7 @@
 import { Fragment, useEffect, useState } from "react";
 import { Label } from "../ui/label";
-import { Checkbox } from "../ui/checkbox";
 import { Separator } from "../ui/separator";
+import { Checkbox } from "../ui/checkbox";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -15,17 +15,16 @@ function ProductFilter({ filters, handleFilter }) {
   const [dynamicFilters, setDynamicFilters] = useState({});
 
   useEffect(() => {
-  const fetchFilterOptions = async () => {
-    try {
-      const [brandRes, categoryRes, genreRes] = await Promise.all([
-        axios.get("/api/brands"),
-        axios.get("/api/categories"),
-        axios.get("/api/genres"),
-    ]);
-    console.log("BRANDS", brandRes);
-    console.log("CATEGORIES", categoryRes);
-    console.log("GENRES", genreRes);
-
+    const fetchFilterOptions = async () => {
+      try {
+        const [brandRes, categoryRes, genreRes] = await Promise.all([
+          axios.get("/api/brands"),
+          axios.get("/api/categories"),
+          axios.get("/api/genres"),
+        ]);
+        console.log("BRANDS", brandRes);
+        console.log("CATEGORIES", categoryRes);
+        console.log("GENRES", genreRes);
 
         setDynamicFilters({
           brand: brandRes.data.data.map((b) => ({
