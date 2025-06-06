@@ -40,6 +40,30 @@ function AdminOrdersView() {
 
   return (
     <div className="grid grid-cols-1 gap-4 sm:gap-6 p-3 sm:p-4 md:p-6">
+      {/* Summary Cards - Order Status Counts */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4 lg:gap-6">
+        <SummaryCard
+          title="Pending"
+          value={orderList?.filter(order => order.orderStatus === "pending").length || 0}
+          color="text-gray-600"
+        />
+        <SummaryCard
+          title="In Process"
+          value={orderList?.filter(order => order.orderStatus === "inProcess").length || 0}
+          color="text-blue-600"
+        />
+        <SummaryCard
+          title="In Shipping"
+          value={orderList?.filter(order => order.orderStatus === "inShipping").length || 0}
+          color="text-orange-600"
+        />
+        <SummaryCard
+          title="Delivered"
+          value={orderList?.filter(order => order.orderStatus === "delivered").length || 0}
+          color="text-green-600"
+        />
+      </div>
+
       {/* Orders Table - Responsive Design */}
       <Card className="hover:shadow-lg transition-shadow duration-200">
         <CardHeader className="p-3 sm:p-4 lg:p-6">
@@ -146,17 +170,27 @@ function AdminOrdersView() {
                       {/* Status and Price */}
                       <div className="flex justify-between items-center">
                         <Badge
-                          className={`py-1 px-2 text-xs ${
-                            orderItem?.orderStatus === "confirmed"
-                              ? "bg-green-500 hover:bg-green-600"
+                          className={`py-1 px-2 text-xs text-white w-[85px] text-center whitespace-nowrap flex items-center justify-center ${
+                            orderItem?.orderStatus === "delivered"
+                              ? "bg-[#66BB6A] hover:bg-[#5CAD60]"
                               : orderItem?.orderStatus === "rejected"
-                              ? "bg-red-600 hover:bg-red-700"
-                              : orderItem?.orderStatus === "delivered"
-                              ? "bg-blue-500 hover:bg-blue-600"
-                              : "bg-yellow-500 hover:bg-yellow-600"
+                              ? "bg-[#EF5350] hover:bg-[#E53E3E]"
+                              : orderItem?.orderStatus === "inShipping"
+                              ? "bg-[#FFA726] hover:bg-[#FB8C00]"
+                              : orderItem?.orderStatus === "inProcess"
+                              ? "bg-[#42A5F5] hover:bg-[#2196F3]"
+                              : "bg-[#B0BEC5] hover:bg-[#90A4AE]"
                           }`}
                         >
-                          {orderItem?.orderStatus}
+                          {orderItem?.orderStatus === "delivered"
+                            ? "Delivered"
+                            : orderItem?.orderStatus === "rejected"
+                            ? "Rejected"
+                            : orderItem?.orderStatus === "inShipping"
+                            ? "In Shipping"
+                            : orderItem?.orderStatus === "inProcess"
+                            ? "In Process"
+                            : "Pending"}
                         </Badge>
                         <p className="text-lg font-bold text-primary">
                           ${orderItem?.totalAmount}
@@ -197,6 +231,19 @@ function AdminOrdersView() {
         <AdminOrderDetailsView orderDetails={orderDetails} />
       </Dialog>
     </div>
+  );
+}
+
+function SummaryCard({ title, value, color }) {
+  return (
+    <Card className="hover:shadow-lg transition-shadow duration-200">
+      <CardHeader className="p-3 sm:p-4 lg:p-6">
+        <CardTitle className="text-sm sm:text-base lg:text-lg text-muted-foreground font-medium">{title}</CardTitle>
+      </CardHeader>
+      <CardContent className="p-3 sm:p-4 lg:p-6 pt-0">
+        <p className={`text-lg sm:text-xl lg:text-2xl xl:text-3xl font-bold ${color}`}>{value}</p>
+      </CardContent>
+    </Card>
   );
 }
 
