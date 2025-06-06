@@ -59,8 +59,14 @@ export default function AdminDashboard() {
     const deliveredOrders = orderList?.filter(order => order.orderStatus === 'delivered') || [];
     const totalSales = deliveredOrders.reduce((sum, order) => sum + (order.totalAmount || 0), 0);
     
-    // Count total delivered orders
-    const totalOrders = deliveredOrders.length;
+    // Count total book orders (quantity of books, not just order transactions)
+    const totalBookOrders = deliveredOrders.reduce((totalBooks, order) => {
+      // Sum up all quantities from cart items in each order
+      const orderBookCount = order.cartItems?.reduce((bookSum, item) => {
+        return bookSum + (item.quantity || 0);
+      }, 0) || 0;
+      return totalBooks + orderBookCount;
+    }, 0);
     
     // Count active products
     const activeItems = productList?.length || 0;
@@ -70,7 +76,7 @@ export default function AdminDashboard() {
     
     return {
       totalSales,
-      totalOrders,
+      totalBookOrders,
       activeItems,
       visits: customerVisits,
     };
@@ -78,12 +84,113 @@ export default function AdminDashboard() {
 
   const summaryStats = calculateStats();
 
+  // Generate dynamic chart data based on actual orders
+  const generateChartData = () => {
+    const deliveredOrders = orderList?.filter(order => order.orderStatus === 'delivered') || [];
+    
+    // Get last 6 months
+    const months = [];
+    const monthNames = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+    const currentDate = new Date();
+    
+    for (let i = 5; i >= 0; i--) {
+      const date = new Date(currentDate.getFullYear(), currentDate.getMonth() - i, 1);
+      months.push({
+        name: monthNames[date.getMonth()],
+        year: date.getFullYear(),
+        month: date.getMonth()
+      });
+    }
+
+    // Calculate monthly revenue and orders
+    const monthlyRevenue = months.map(month => {
+      return deliveredOrders
+        .filter(order => {
+          const orderDate = new Date(order.orderDate || order.createdAt);
+          return orderDate.getMonth() === month.month && orderDate.getFullYear() === month.year;
+        })
+        .reduce((sum, order) => sum + (order.totalAmount || 0), 0);
+    });
+
+    const monthlyOrderCounts = months.map(month => {
+      return deliveredOrders
+        .filter(order => {
+          const orderDate = new Date(order.orderDate || order.createdAt);
+          return orderDate.getMonth() === month.month && orderDate.getFullYear() === month.year;
+        })
+        .reduce((totalBooks, order) => {
+          const orderBookCount = order.cartItems?.reduce((bookSum, item) => {
+            return bookSum + (item.quantity || 0);
+          }, 0) || 0;
+          return totalBooks + orderBookCount;
+        }, 0);
+    });
+
+    return { months: months.map(m => m.name), monthlyRevenue, monthlyOrderCounts };
+  };
+
+  // Generate genre sales data from actual orders
+  const generateGenreSales = () => {
+    const deliveredOrders = orderList?.filter(order => order.orderStatus === 'delivered') || [];
+    const genreStats = {};
+
+    deliveredOrders.forEach(order => {
+      order.cartItems?.forEach(item => {
+        const genre = item.genre || 'Unknown';
+        const quantity = item.quantity || 0;
+        genreStats[genre] = (genreStats[genre] || 0) + quantity;
+      });
+    });
+
+    const labels = Object.keys(genreStats);
+    const data = Object.values(genreStats);
+    const colors = ["#3b82f6", "#60a5fa", "#93c5fd", "#1e40af", "#bfdbfe", "#2563eb", "#1d4ed8"];
+
+    return { labels, data, colors: colors.slice(0, labels.length) };
+  };
+
+  // Generate top selling books from actual orders
+  const generateTopSellingBooks = () => {
+    const deliveredOrders = orderList?.filter(order => order.orderStatus === 'delivered') || [];
+    const bookStats = {};
+
+    deliveredOrders.forEach(order => {
+      order.cartItems?.forEach(item => {
+        const title = item.title || 'Unknown Book';
+        const quantity = item.quantity || 0;
+        bookStats[title] = (bookStats[title] || 0) + quantity;
+      });
+    });
+
+    return Object.entries(bookStats)
+      .map(([title, sales]) => ({ title, sales }))
+      .sort((a, b) => b.sales - a.sales)
+      .slice(0, 5);
+  };
+
+  // Generate low inventory items from product list
+  const generateLowInventory = () => {
+    return (productList || [])
+      .filter(product => (product.totalStock || 0) <= 5)
+      .map(product => ({
+        title: product.title,
+        quantity: product.totalStock || 0
+      }))
+      .sort((a, b) => a.quantity - b.quantity)
+      .slice(0, 5);
+  };
+
+  const chartData = generateChartData();
+  const genreSalesData = generateGenreSales();
+  const topSellingBooks = generateTopSellingBooks();
+  const lowInventory = generateLowInventory();
+
   const monthlyRevenue = {
-    labels: ["Jan", "Feb", "Mar", "Apr", "May", "Jun"],
+    labels: chartData.months,
     datasets: [
       {
         label: "Revenue ($)",
-        data: [12500, 9800, 13900, 11200, 14500, 13350],
+        data: chartData.monthlyRevenue,
         fill: false,
         tension: 0.3,
         borderColor: "#3b82f6",
@@ -93,47 +200,27 @@ export default function AdminDashboard() {
   };
 
   const monthlyOrders = {
-    labels: ["Jan", "Feb", "Mar", "Apr", "May", "Jun"],
+    labels: chartData.months,
     datasets: [
       {
-        label: "Orders",
-        data: [320, 410, 510, 380, 450, 620],
+        label: "Books Sold",
+        data: chartData.monthlyOrderCounts,
         backgroundColor: "#60a5fa",
       },
     ],
   };
 
   const genreSales = {
-    labels: ["Fiction", "Non‑fiction", "Sci‑Fi", "Romance", "Children"],
+    labels: genreSalesData.labels,
     datasets: [
       {
         label: "Books Sold",
-        data: [320, 240, 180, 150, 200],
-        backgroundColor: [
-          "#3b82f6",
-          "#60a5fa",
-          "#93c5fd",
-          "#1e40af",
-          "#bfdbfe",
-        ],
+        data: genreSalesData.data,
+        backgroundColor: genreSalesData.colors,
         borderWidth: 1,
       },
     ],
   };
-
-  const topSellingBooks = [
-    { title: "The Silent Patient", sales: 150 },
-    { title: "Atomic Habits", sales: 130 },
-    { title: "1984", sales: 120 },
-    { title: "The Alchemist", sales: 115 },
-    { title: "To Kill a Mockingbird", sales: 100 },
-  ];
-
-  const lowInventory = [
-    { title: "Dune", quantity: 3 },
-    { title: "The Hobbit", quantity: 5 },
-    { title: "Sapiens", quantity: 2 },
-  ];
 
   const [itemType, setItemType] = useState("category");
   const [itemName, setItemName] = useState("");
@@ -244,7 +331,7 @@ export default function AdminDashboard() {
       {/* Summary Cards - Same pattern as product page */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4 lg:gap-6">
         <SummaryCard title="Total Sales" value={`$${summaryStats.totalSales.toLocaleString()}`} />
-        <SummaryCard title="Total Orders" value={summaryStats.totalOrders} />
+        <SummaryCard title="Total Book Orders" value={summaryStats.totalBookOrders} />
         <SummaryCard title="Active Items" value={summaryStats.activeItems} />
         <SummaryCard title="Visits" value={summaryStats.visits.toLocaleString()} />
       </div>
