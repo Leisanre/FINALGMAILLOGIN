@@ -111,3 +111,34 @@
     transition: font-size 0.15s ease-in-out;
   }
 }
+
+/* Prevent browser window from being resized too small */
+@media screen {
+  html {
+    min-width: 400px;
+    min-height: 600px;
+  }
+  
+  body {
+    min-width: 400px;
+    min-height: 600px;
+    overflow-x: auto;
+  }
+}
+
+/* Container minimum width to prevent layout destruction */
+.min-layout-protection {
+  min-width: 320px;
+  max-width: 100vw;
+  overflow-x: auto;
+}
+
+/* Ensure content doesn't break below minimum viewport */
+@media (max-width: 399px) {
+  body {
+    transform: scale(0.8);
+    transform-origin: top left;
+    width: 125%;
+    height: 125%;
+  }
+}
