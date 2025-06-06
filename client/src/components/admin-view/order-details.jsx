@@ -16,7 +16,7 @@ const initialFormData = {
   status: "",
 };
 
-function AdminOrderDetailsView({ orderDetails }) {
+function AdminOrderDetailsView({ orderDetails, onClose }) {
   const [formData, setFormData] = useState(initialFormData);
   const { user } = useSelector((state) => state.auth);
   const dispatch = useDispatch();
@@ -38,6 +38,12 @@ function AdminOrderDetailsView({ orderDetails }) {
         toast({
           title: data?.payload?.message,
         });
+        // Close the dialog after successful update
+        if (onClose) {
+          setTimeout(() => {
+            onClose();
+          }, 1000); // Small delay to show the success message
+        }
       }
     });
   }

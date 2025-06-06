@@ -29,10 +29,12 @@ function AdminOrdersView() {
     dispatch(getOrderDetailsForAdmin(getId));
   }
 
-  // Filter orders based on selected status
-  const filteredOrders = selectedStatus === "all" 
-    ? orderList 
-    : orderList?.filter(order => order.orderStatus === selectedStatus);
+  // Sort orders by date (latest first) and filter based on selected status
+  const sortedOrders = orderList?.slice().sort((a, b) => new Date(b.orderDate) - new Date(a.orderDate));
+  
+  const filteredOrders = selectedStatus === "all"
+    ? sortedOrders?.filter(order => order.orderStatus !== "delivered") // Exclude delivered from "All Orders"
+    : sortedOrders?.filter(order => order.orderStatus === selectedStatus);
 
   // Handle status filter click
   const handleStatusFilter = (status) => {
@@ -284,7 +286,13 @@ function AdminOrdersView() {
           dispatch(resetOrderDetails());
         }}
       >
-        <AdminOrderDetailsView orderDetails={orderDetails} />
+        <AdminOrderDetailsView
+          orderDetails={orderDetails}
+          onClose={() => {
+            setOpenDetailsDialog(false);
+            dispatch(resetOrderDetails());
+          }}
+        />
       </Dialog>
     </div>
   );
