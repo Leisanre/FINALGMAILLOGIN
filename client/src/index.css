@@ -67,3 +67,47 @@
     @apply bg-background text-foreground;
   }
 }
+
+/* Responsive transitions for smooth layout changes */
+@layer components {
+  .responsive-grid {
+    transition: all 0.3s ease-in-out;
+  }
+  
+  .responsive-card {
+    transition: all 0.2s ease-in-out;
+  }
+  
+  .responsive-text {
+    transition: font-size 0.2s ease-in-out;
+  }
+  
+  .responsive-spacing {
+    transition: padding 0.2s ease-in-out, margin 0.2s ease-in-out;
+  }
+}
+
+/* Ensure grid layouts respond instantly */
+.grid {
+  transition: grid-template-columns 0.2s ease-in-out;
+}
+
+/* Chart container responsive behavior */
+.chart-container {
+  transition: height 0.3s ease-in-out;
+}
+
+/* Smooth responsive transitions for dashboard */
+@media (prefers-reduced-motion: no-preference) {
+  .dashboard-container {
+    transition: all 0.2s ease-in-out;
+  }
+  
+  .dashboard-card {
+    transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+  }
+  
+  .dashboard-text {
+    transition: font-size 0.15s ease-in-out;
+  }
+}

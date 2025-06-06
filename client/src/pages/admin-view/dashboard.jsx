@@ -206,70 +206,136 @@ export default function AdminDashboard() {
   }, [dispatch]);
 
   return (
-    <div className="max-w-6xl mx-auto p-6 space-y-10 bg-white text-gray-900 transition-colors duration-300">
-      <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
+    <div className="grid grid-cols-1 gap-4 sm:gap-6 p-3 sm:p-4 md:p-6">
+      {/* Summary Cards - Same pattern as product page */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4 lg:gap-6">
         <SummaryCard title="Total Sales" value={`$${summaryStats.totalSales.toLocaleString()}`} />
         <SummaryCard title="Total Orders" value={summaryStats.totalOrders} />
         <SummaryCard title="Active Items" value={summaryStats.activeItems} />
         <SummaryCard title="Customers" value={summaryStats.customers} />
       </div>
 
-      <div className="grid gap-6 lg:grid-cols-3">
-        <Card className="col-span-2">
-          <CardHeader>
-            <CardTitle>Monthly Revenue</CardTitle>
+      {/* Charts Section - Responsive like product grid */}
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 sm:gap-6">
+        {/* Monthly Revenue Chart */}
+        <Card className="lg:col-span-2">
+          <CardHeader className="p-3 sm:p-4 lg:p-6">
+            <CardTitle className="text-base sm:text-lg lg:text-xl">Monthly Revenue</CardTitle>
           </CardHeader>
-          <CardContent>
-            <Line data={monthlyRevenue} options={{ responsive: true }} />
+          <CardContent className="p-3 sm:p-4 lg:p-6 pt-0">
+            <div className="h-48 sm:h-64 lg:h-80">
+              <Line
+                data={monthlyRevenue}
+                options={{
+                  responsive: true,
+                  maintainAspectRatio: false,
+                  scales: {
+                    y: {
+                      beginAtZero: true,
+                      ticks: { font: { size: 11 } }
+                    },
+                    x: {
+                      ticks: { font: { size: 11 } }
+                    }
+                  },
+                  plugins: {
+                    legend: {
+                      position: "top",
+                      labels: { font: { size: 12 }, usePointStyle: true, padding: 15 }
+                    }
+                  }
+                }}
+              />
+            </div>
           </CardContent>
         </Card>
 
-        <Card>
-          <CardHeader>
-            <CardTitle>Sales by Genre</CardTitle>
+        {/* Sales by Genre Chart */}
+        <Card className="lg:col-span-1">
+          <CardHeader className="p-3 sm:p-4 lg:p-6">
+            <CardTitle className="text-base sm:text-lg lg:text-xl">Sales by Genre</CardTitle>
           </CardHeader>
-          <CardContent>
-            <Doughnut data={genreSales} options={{ responsive: true, plugins: { legend: { position: "bottom" } } }} />
+          <CardContent className="p-3 sm:p-4 lg:p-6 pt-0">
+            <div className="h-48 sm:h-64 lg:h-80">
+              <Doughnut
+                data={genreSales}
+                options={{
+                  responsive: true,
+                  maintainAspectRatio: false,
+                  plugins: {
+                    legend: {
+                      position: "bottom",
+                      labels: { font: { size: 11 }, padding: 15, usePointStyle: true }
+                    }
+                  }
+                }}
+              />
+            </div>
           </CardContent>
         </Card>
       </div>
 
+      {/* Monthly Orders Chart - Full Width */}
       <Card>
-        <CardHeader>
-          <CardTitle>Monthly Orders</CardTitle>
+        <CardHeader className="p-3 sm:p-4 lg:p-6">
+          <CardTitle className="text-base sm:text-lg lg:text-xl">Monthly Orders</CardTitle>
         </CardHeader>
-        <CardContent>
-          <Bar data={monthlyOrders} options={{ responsive: true, plugins: { legend: { position: "top" } } }} />
+        <CardContent className="p-3 sm:p-4 lg:p-6 pt-0">
+          <div className="h-48 sm:h-64 lg:h-80">
+            <Bar
+              data={monthlyOrders}
+              options={{
+                responsive: true,
+                maintainAspectRatio: false,
+                scales: {
+                  y: {
+                    beginAtZero: true,
+                    ticks: { font: { size: 11 } }
+                  },
+                  x: {
+                    ticks: { font: { size: 11 } }
+                  }
+                },
+                plugins: {
+                  legend: {
+                    position: "top",
+                    labels: { font: { size: 12 }, usePointStyle: true, padding: 15 }
+                  }
+                }
+              }}
+            />
+          </div>
         </CardContent>
       </Card>
 
-      <div className="grid gap-6 lg:grid-cols-2">
-        <Card>
-          <CardHeader>
-            <CardTitle>Top Selling Books</CardTitle>
+      {/* Data Tables - Same as product listing */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6">
+        <Card className="hover:shadow-lg transition-shadow duration-200">
+          <CardHeader className="p-3 sm:p-4 lg:p-6">
+            <CardTitle className="text-base sm:text-lg lg:text-xl">Top Selling Books</CardTitle>
           </CardHeader>
-          <CardContent>
+          <CardContent className="p-3 sm:p-4 lg:p-6 pt-0">
             <ul className="divide-y divide-muted-foreground/20">
               {topSellingBooks.map((book) => (
-                <li key={book.title} className="flex items-center justify-between py-3 text-sm">
-                  <span>{book.title}</span>
-                  <span className="font-medium">{book.sales} sold</span>
+                <li key={book.title} className="flex items-center justify-between py-2 sm:py-3 text-xs sm:text-sm lg:text-base">
+                  <span className="truncate pr-2 flex-1">{book.title}</span>
+                  <span className="font-medium whitespace-nowrap">{book.sales} sold</span>
                 </li>
               ))}
             </ul>
           </CardContent>
         </Card>
 
-        <Card>
-          <CardHeader>
-            <CardTitle className="text-red-600">Low Inventory Alerts</CardTitle>
+        <Card className="hover:shadow-lg transition-shadow duration-200">
+          <CardHeader className="p-3 sm:p-4 lg:p-6">
+            <CardTitle className="text-red-600 text-base sm:text-lg lg:text-xl">Low Inventory Alerts</CardTitle>
           </CardHeader>
-          <CardContent>
+          <CardContent className="p-3 sm:p-4 lg:p-6 pt-0">
             <ul className="divide-y divide-muted-foreground/20">
               {lowInventory.map((item) => (
-                <li key={item.title} className="flex items-center justify-between py-3 text-sm text-red-600">
-                  <span>{item.title}</span>
-                  <span className="font-medium">{item.quantity} left</span>
+                <li key={item.title} className="flex items-center justify-between py-2 sm:py-3 text-xs sm:text-sm lg:text-base text-red-600">
+                  <span className="truncate pr-2 flex-1">{item.title}</span>
+                  <span className="font-medium whitespace-nowrap">{item.quantity} left</span>
                 </li>
               ))}
             </ul>
@@ -277,16 +343,17 @@ export default function AdminDashboard() {
         </Card>
       </div>
 
+      {/* Add Item Form */}
       <Card className="bg-blue-600 text-white">
-        <CardHeader>
-          <CardTitle>Add Category, Brand, or Genre</CardTitle>
+        <CardHeader className="p-3 sm:p-4 lg:p-6">
+          <CardTitle className="text-base sm:text-lg lg:text-xl">Add Category, Brand, or Genre</CardTitle>
         </CardHeader>
-        <CardContent>
-          <form onSubmit={handleAddItem} className="flex flex-col sm:flex-row gap-4">
+        <CardContent className="p-3 sm:p-4 lg:p-6 pt-0">
+          <form onSubmit={handleAddItem} className="flex flex-col sm:flex-row gap-3 sm:gap-4">
             <select
               value={itemType}
               onChange={(e) => setItemType(e.target.value)}
-              className="p-3 rounded-md text-black w-full sm:w-40 focus:outline-none"
+              className="p-2 sm:p-3 rounded-md text-black w-full sm:w-32 md:w-40 focus:outline-none text-sm sm:text-base"
             >
               <option value="category">Category</option>
               <option value="brand">Brand</option>
@@ -298,11 +365,11 @@ export default function AdminDashboard() {
               value={itemName}
               onChange={(e) => setItemName(e.target.value)}
               required
-              className="flex-1 p-3 rounded-md text-black focus:outline-none"
+              className="flex-1 p-2 sm:p-3 rounded-md text-black focus:outline-none text-sm sm:text-base"
             />
             <button
               type="submit"
-              className="bg-white text-blue-600 font-semibold px-6 py-3 rounded-md hover:bg-blue-100 transition-colors"
+              className="bg-white text-blue-600 font-semibold px-4 sm:px-6 py-2 sm:py-3 rounded-md hover:bg-blue-100 transition-colors text-sm sm:text-base whitespace-nowrap"
             >
               Add
             </button>
@@ -310,45 +377,60 @@ export default function AdminDashboard() {
         </CardContent>
       </Card>
 
-      <div className="space-y-6">
-        <ProductImageUpload
-          imageFile={imageFile}
-          setImageFile={setImageFile}
-          uploadedImageUrl={uploadedImageUrl}
-          setUploadedImageUrl={setUploadedImageUrl}
-          setImageLoadingState={setImageLoadingState}
-          imageLoadingState={imageLoadingState}
-          isCustomStyling
-        />
-        <Button
-          onClick={handleUploadFeatureImage}
-          className="w-full bg-blue-600 hover:bg-blue-700"
-          disabled={imageLoadingState || !imageFile || !uploadedImageUrl}
-        >
-          {imageLoadingState ? "Uploading..." : "Upload"}
-        </Button>
-        {featureImageList?.length > 0 && (
-          <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
-            {featureImageList.map((featureImgItem) => (
-              <div key={featureImgItem.id || featureImgItem.image} className="relative group">
-                <img
-                  src={featureImgItem.image}
-                  alt="Feature"
-                  className="w-full h-72 object-cover rounded-lg shadow-md"
-                />
-                <div className="absolute inset-0 bg-black bg-opacity-50 opacity-0 group-hover:opacity-100 flex items-center justify-center transition-opacity">
-                  <Button
-                    onClick={() => handleDeleteClick(featureImgItem)}
-                    className="bg-red-600 hover:bg-red-700 text-white"
-                  >
-                    Delete
-                  </Button>
+      {/* Image Upload Section */}
+      <Card>
+        <CardHeader className="p-3 sm:p-4 lg:p-6">
+          <CardTitle className="text-base sm:text-lg lg:text-xl">Feature Images</CardTitle>
+        </CardHeader>
+        <CardContent className="p-3 sm:p-4 lg:p-6 pt-0 space-y-4 sm:space-y-6">
+          <ProductImageUpload
+            imageFile={imageFile}
+            setImageFile={setImageFile}
+            uploadedImageUrl={uploadedImageUrl}
+            setUploadedImageUrl={setUploadedImageUrl}
+            setImageLoadingState={setImageLoadingState}
+            imageLoadingState={imageLoadingState}
+            isCustomStyling
+          />
+          <Button
+            onClick={handleUploadFeatureImage}
+            className="w-full bg-blue-600 hover:bg-blue-700 py-2 sm:py-3 text-sm sm:text-base"
+            disabled={imageLoadingState || !imageFile || !uploadedImageUrl}
+          >
+            {imageLoadingState ? "Uploading..." : "Upload Feature Image"}
+          </Button>
+        </CardContent>
+      </Card>
+
+      {/* Feature Images Grid - Same as product grid */}
+      {featureImageList?.length > 0 && (
+        <Card>
+          <CardHeader className="p-3 sm:p-4 lg:p-6">
+            <CardTitle className="text-base sm:text-lg lg:text-xl">Current Feature Images</CardTitle>
+          </CardHeader>
+          <CardContent className="p-3 sm:p-4 lg:p-6 pt-0">
+            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3 sm:gap-4 lg:gap-6">
+              {featureImageList.map((featureImgItem) => (
+                <div key={featureImgItem.id || featureImgItem.image} className="relative group">
+                  <img
+                    src={featureImgItem.image}
+                    alt="Feature"
+                    className="w-full h-48 sm:h-56 md:h-64 lg:h-72 object-cover rounded-lg shadow-md transition-transform duration-200 group-hover:scale-105"
+                  />
+                  <div className="absolute inset-0 bg-black bg-opacity-50 opacity-0 group-hover:opacity-100 flex items-center justify-center transition-opacity duration-200 rounded-lg">
+                    <Button
+                      onClick={() => handleDeleteClick(featureImgItem)}
+                      className="bg-red-600 hover:bg-red-700 text-white text-xs sm:text-sm px-3 sm:px-4 py-1 sm:py-2"
+                    >
+                      Delete
+                    </Button>
+                  </div>
                 </div>
-              </div>
-            ))}
-          </div>
-        )}
-      </div>
+              ))}
+            </div>
+          </CardContent>
+        </Card>
+      )}
 
       {/* Delete Confirmation Dialog */}
       <Dialog open={showDeleteDialog} onOpenChange={setShowDeleteDialog}>
@@ -381,12 +463,12 @@ export default function AdminDashboard() {
 
 function SummaryCard({ title, value }) {
   return (
-    <Card>
-      <CardHeader>
-        <CardTitle>{title}</CardTitle>
+    <Card className="hover:shadow-lg transition-shadow duration-200">
+      <CardHeader className="p-3 sm:p-4 lg:p-6">
+        <CardTitle className="text-sm sm:text-base lg:text-lg text-muted-foreground font-medium">{title}</CardTitle>
       </CardHeader>
-      <CardContent>
-        <p className="text-2xl font-bold">{value}</p>
+      <CardContent className="p-3 sm:p-4 lg:p-6 pt-0">
+        <p className="text-lg sm:text-xl lg:text-2xl xl:text-3xl font-bold text-primary">{value}</p>
       </CardContent>
     </Card>
   );
