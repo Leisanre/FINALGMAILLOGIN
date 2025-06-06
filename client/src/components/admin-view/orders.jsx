@@ -72,14 +72,16 @@ function AdminOrdersView() {
                         </TableCell>
                         <TableCell>
                           <Badge
-                            className={`py-1 px-2 sm:py-1 sm:px-3 text-xs sm:text-sm ${
-                              orderItem?.orderStatus === "confirmed"
-                                ? "bg-green-500 hover:bg-green-600"
+                            className={`py-1 px-2 sm:py-1 sm:px-3 text-xs sm:text-sm text-white ${
+                              orderItem?.orderStatus === "delivered"
+                                ? "bg-[#66BB6A] hover:bg-[#5CAD60]"
                                 : orderItem?.orderStatus === "rejected"
-                                ? "bg-red-600 hover:bg-red-700"
-                                : orderItem?.orderStatus === "delivered"
-                                ? "bg-blue-500 hover:bg-blue-600"
-                                : "bg-yellow-500 hover:bg-yellow-600"
+                                ? "bg-[#EF5350] hover:bg-[#E53E3E]"
+                                : orderItem?.orderStatus === "inShipping"
+                                ? "bg-[#FFA726] hover:bg-[#FB8C00]"
+                                : orderItem?.orderStatus === "inProcess"
+                                ? "bg-[#42A5F5] hover:bg-[#2196F3]"
+                                : "bg-[#B0BEC5] hover:bg-[#90A4AE]"
                             }`}
                           >
                             {orderItem?.orderStatus}

@@ -70,12 +70,16 @@ function AdminOrderDetailsView({ orderDetails }) {
             <p className="font-medium">Order Status</p>
             <Label>
               <Badge
-                className={`py-1 px-3 ${
-                  orderDetails?.orderStatus === "confirmed"
-                    ? "bg-green-500"
+                className={`py-1 px-3 text-white ${
+                  orderDetails?.orderStatus === "delivered"
+                    ? "bg-[#66BB6A] hover:bg-[#5CAD60]"
                     : orderDetails?.orderStatus === "rejected"
-                    ? "bg-red-600"
-                    : "bg-black"
+                    ? "bg-[#EF5350] hover:bg-[#E53E3E]"
+                    : orderDetails?.orderStatus === "inShipping"
+                    ? "bg-[#FFA726] hover:bg-[#FB8C00]"
+                    : orderDetails?.orderStatus === "inProcess"
+                    ? "bg-[#42A5F5] hover:bg-[#2196F3]"
+                    : "bg-[#B0BEC5] hover:bg-[#90A4AE]"
                 }`}
               >
                 {orderDetails?.orderStatus}
