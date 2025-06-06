@@ -51,7 +51,7 @@ function ProductFilter({ filters, handleFilter }) {
         {Object.keys(dynamicFilters).map((keyItem) => (
           <Fragment key={keyItem}>
             <div>
-              <h3 className="text-base font-bold capitalize">{keyItem}</h3>
+              <h3 className="text-base font-bold capitalize">{keyItem === 'brand' ? 'Type' : keyItem}</h3>
               <div className="grid gap-2 mt-2">
                 {dynamicFilters[keyItem].map((option) => (
                   <Label

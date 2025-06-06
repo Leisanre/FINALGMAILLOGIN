@@ -212,10 +212,10 @@ function ShoppingHome() {
         </div>
       </section>
 
-      {/* Shop by Brand Section */}
+      {/* Shop by Type Section */}
       <section className="py-6 xs:py-8 sm:py-10 md:py-12 bg-gray-50">
         <div className="container mx-auto px-2 xs:px-3 sm:px-4">
-          <h2 className="text-lg xs:text-xl sm:text-2xl md:text-3xl font-bold text-center mb-4 xs:mb-6 sm:mb-8">Shop by Brand</h2>
+          <h2 className="text-lg xs:text-xl sm:text-2xl md:text-3xl font-bold text-center mb-4 xs:mb-6 sm:mb-8">Shop by Type</h2>
           <div className="grid grid-cols-2 xs:grid-cols-3 sm:grid-cols-4 md:grid-cols-5 lg:grid-cols-6 gap-2 xs:gap-3 sm:gap-4">
             {brandsWithIcon.map((brandItem) => (
               <Card

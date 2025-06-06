@@ -12,7 +12,7 @@ const addGenre = async (req, res) => {
   }
 };
 
-const getGenre = async (req, res) => {
+const getGenres = async (req, res) => {
   try {
     const genres = await Genre.find();
     res.status(200).json({ success: true, data: genres });
@@ -31,4 +31,4 @@ const deleteGenre = async (req, res) => {
   }
 };
 
-module.exports = { addGenre, getGenre, deleteGenre };
+module.exports = { addGenre, getGenres, deleteGenre };

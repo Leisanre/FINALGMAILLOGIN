@@ -140,16 +140,29 @@ function AdminProducts() {
   function handleConfirmItemDelete() {
     if (itemToDelete) {
       const { item, deleteAction, getAction, label } = itemToDelete;
-      dispatch(deleteAction(item._id || item)).then((data) => {
+      // Determine the correct ID to pass
+      const itemId = typeof item === 'object' && item._id ? item._id : item;
+      
+      console.log('Deleting item:', { item, itemId, label });
+      
+      dispatch(deleteAction(itemId)).then((data) => {
+        console.log('Delete response:', data);
         if (data?.payload?.success) {
           toast({ title: `${label} deleted successfully` });
           dispatch(getAction());
         } else {
+          console.error('Delete failed:', data?.payload || data);
           toast({
             title: `Failed to delete ${label}`,
             variant: "destructive",
           });
         }
+      }).catch((error) => {
+        console.error('Delete error:', error);
+        toast({
+          title: `Failed to delete ${label}`,
+          variant: "destructive",
+        });
       });
     }
     setShowItemDeleteDialog(false);
@@ -248,7 +261,7 @@ function AdminProducts() {
             deleteAction: deleteCategory,
           },
           {
-            label: "Brand",
+            label: "Type",
             value: newBrand,
             setter: setNewBrand,
             action: addBrand,

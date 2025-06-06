@@ -63,7 +63,7 @@ function AdminProductTile({
             )}
             {product?.brand && (
               <div className="flex items-center gap-2">
-                <span className="text-xs font-medium text-gray-500">Brand:</span>
+                <span className="text-xs font-medium text-gray-500">Type:</span>
                 <span className="text-xs text-gray-700">{product.brand}</span>
               </div>
             )}

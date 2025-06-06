@@ -66,8 +66,15 @@ export const addBrand = createAsyncThunk("common/addBrand", async (name) => {
 });
 
 export const deleteBrand = createAsyncThunk("common/deleteBrand", async (id) => {
-  const response = await axios.delete(`http://localhost:5000/api/brands/${id}`);
-  return response.data;
+  console.log('Deleting brand with ID:', id);
+  try {
+    const response = await axios.delete(`http://localhost:5000/api/brands/${id}`);
+    console.log('Delete brand response:', response.data);
+    return response.data;
+  } catch (error) {
+    console.error('Delete brand error:', error.response?.data || error.message);
+    throw error;
+  }
 });
 
 
@@ -132,6 +139,9 @@ extraReducers: (builder) => {
     .addCase(deleteBrand.fulfilled, (state, action) => {
       const deletedId = action.meta.arg;
       state.brandList = state.brandList.filter((b) => b._id !== deletedId);
+    })
+    .addCase(deleteBrand.rejected, (state, action) => {
+      console.error('Delete brand rejected:', action.error);
     });
 },
 });
