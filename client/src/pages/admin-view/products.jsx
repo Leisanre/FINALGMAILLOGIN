@@ -215,14 +215,33 @@ function AdminProducts() {
           : field.name === "category"
           ? categoryList
           : brandList;
-      return {
-        ...field,
-        type: "select",
-        options: list.map((item) => ({
-          id: item.name || item,
-          label: item.name || item,
-        })),
-      };
+      
+      // For genre, we need to store the ID that matches genreOptionsMap
+      // For other fields, store the name
+      if (field.name === "genre") {
+        return {
+          ...field,
+          type: "select",
+          options: list.map((item) => {
+            const genreName = item.name || item;
+            // Convert genre name to ID that matches genreOptionsMap
+            const genreId = genreName.toLowerCase().replace(/\s+/g, '-');
+            return {
+              id: genreId,
+              label: genreName,
+            };
+          }),
+        };
+      } else {
+        return {
+          ...field,
+          type: "select",
+          options: list.map((item) => ({
+            id: item.name || item,
+            label: item.name || item,
+          })),
+        };
+      }
     }
     return field;
   });

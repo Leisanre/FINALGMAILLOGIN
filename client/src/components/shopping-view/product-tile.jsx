@@ -3,6 +3,26 @@ import { Button } from "../ui/button";
 import { brandOptionsMap, categoryOptionsMap, genreOptionsMap } from "@/config";
 import { Badge } from "../ui/badge";
 
+// Helper function to get genre display name
+const getGenreDisplayName = (genre) => {
+  if (!genre) return '';
+  
+  // Check if it's already in the genreOptionsMap (ID format)
+  if (genreOptionsMap[genre]) {
+    return genreOptionsMap[genre];
+  }
+  
+  // Check if it's a genre name that needs to be converted to ID
+  const genreEntries = Object.entries(genreOptionsMap);
+  const matchedEntry = genreEntries.find(([id, name]) => name === genre);
+  if (matchedEntry) {
+    return matchedEntry[1]; // Return the display name
+  }
+  
+  // If not found in map, return as-is (fallback)
+  return genre;
+};
+
 function ShoppingProductTile({
   product,
   handleGetProductDetails,
@@ -46,7 +66,7 @@ function ShoppingProductTile({
             )}
             {product?.genre && (
               <Badge variant="default" className="text-[10px] px-1 py-0">
-                {genreOptionsMap[product?.genre] || product?.genre}
+                {getGenreDisplayName(product?.genre)}
               </Badge>
             )}
           </div>

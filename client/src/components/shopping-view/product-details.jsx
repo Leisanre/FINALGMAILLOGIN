@@ -55,8 +55,22 @@ function ProductDetailsDialog({ open, setOpen, productDetails }) {
   // Helper function to get display name
   const getDisplayName = (type, id) => {
     if (dynamicFilters[type]?.length > 0) {
-      const item = dynamicFilters[type].find(item => item._id === id);
-      return item ? item.name : null;
+      // First try to find by exact ID match
+      let item = dynamicFilters[type].find(item => item._id === id);
+      if (item) return item.name;
+      
+      // For genres, also try to find by name (in case old data uses name instead of ID)
+      if (type === 'genre') {
+        item = dynamicFilters[type].find(item => item.name === id);
+        if (item) return item.name;
+        
+        // Try to find by converted ID (name -> id conversion)
+        item = dynamicFilters[type].find(item => {
+          const convertedId = item.name.toLowerCase().replace(/\s+/g, '-');
+          return convertedId === id;
+        });
+        if (item) return item.name;
+      }
     }
     
     // Fallback to static maps
