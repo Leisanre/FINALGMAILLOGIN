@@ -8,6 +8,7 @@ import {
   DialogTitle,
 } from "../ui/dialog";
 import { useState } from "react";
+import { genreOptionsMap } from "@/config";
 
 function AdminProductTile({
   product,
@@ -71,7 +72,7 @@ function AdminProductTile({
             <div className="flex items-center gap-2">
               <span className="text-xs font-medium text-gray-500">Genre:</span>
               <span className="text-xs text-gray-700">
-                {product?.genre || <span className="text-red-500 italic">No genre set</span>}
+                {product?.genre ? (genreOptionsMap[product.genre] || product.genre) : <span className="text-red-500 italic">No genre set</span>}
               </span>
             </div>
           </div>
