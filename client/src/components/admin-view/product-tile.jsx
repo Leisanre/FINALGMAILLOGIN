@@ -67,12 +67,13 @@ function AdminProductTile({
                 <span className="text-xs text-gray-700">{product.brand}</span>
               </div>
             )}
-            {product?.genre && (
-              <div className="flex items-center gap-2">
-                <span className="text-xs font-medium text-gray-500">Genre:</span>
-                <span className="text-xs text-gray-700">{product.genre}</span>
-              </div>
-            )}
+            {/* Always show Genre field to debug the issue */}
+            <div className="flex items-center gap-2">
+              <span className="text-xs font-medium text-gray-500">Genre:</span>
+              <span className="text-xs text-gray-700">
+                {product?.genre || <span className="text-red-500 italic">No genre set</span>}
+              </span>
+            </div>
           </div>
 
           {/* Stock Information */}
