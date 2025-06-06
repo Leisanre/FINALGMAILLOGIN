@@ -166,6 +166,7 @@ export const genreOptionsMap = {
   mystery: "Mystery",
   "sci-fi": "Sci-Fi",
   fantasy: "Fantasy",
+  action: "Action",
   // Add any additional genres that might be created dynamically
   // These will automatically match the converted IDs from admin form
 };
