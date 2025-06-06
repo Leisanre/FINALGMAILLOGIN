@@ -70,7 +70,7 @@ function AdminOrderDetailsView({ orderDetails }) {
             <p className="font-medium">Order Status</p>
             <Label>
               <Badge
-                className={`py-1 px-3 text-white ${
+                className={`py-1 px-3 text-white w-[95px] text-center whitespace-nowrap flex items-center justify-center ${
                   orderDetails?.orderStatus === "delivered"
                     ? "bg-[#66BB6A] hover:bg-[#5CAD60]"
                     : orderDetails?.orderStatus === "rejected"
@@ -82,7 +82,15 @@ function AdminOrderDetailsView({ orderDetails }) {
                     : "bg-[#B0BEC5] hover:bg-[#90A4AE]"
                 }`}
               >
-                {orderDetails?.orderStatus}
+                {orderDetails?.orderStatus === "delivered"
+                  ? "Delivered"
+                  : orderDetails?.orderStatus === "rejected"
+                  ? "Rejected"
+                  : orderDetails?.orderStatus === "inShipping"
+                  ? "In Shipping"
+                  : orderDetails?.orderStatus === "inProcess"
+                  ? "In Process"
+                  : "Pending"}
               </Badge>
             </Label>
           </div>
