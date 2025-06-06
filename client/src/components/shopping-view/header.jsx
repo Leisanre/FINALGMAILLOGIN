@@ -36,7 +36,8 @@ function MenuItems() {
       getCurrentMenuItem.id !== "products" &&
       getCurrentMenuItem.id !== "search" &&
       getCurrentMenuItem.id !== "about" &&
-      getCurrentMenuItem.id !== "contact"
+      getCurrentMenuItem.id !== "contact" &&
+      getCurrentMenuItem.id !== "store"
         ? {
             category: [getCurrentMenuItem.id],
           }

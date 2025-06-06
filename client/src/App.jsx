@@ -24,6 +24,7 @@ import PaymentSuccessPage from "./pages/shopping-view/payment-success";
 import SearchProducts from "./pages/shopping-view/search";
 import ShoppingAbout from "./pages/shopping-view/about";
 import ShoppingContact from "./pages/shopping-view/contact";
+import ShoppingStore from "./pages/shopping-view/store";
 
 function App() {
   const { user, isAuthenticated, isLoading } = useSelector(
@@ -175,6 +176,7 @@ function App() {
           <Route path="search" element={<SearchProducts />} />
           <Route path="about" element={<ShoppingAbout />} />
           <Route path="contact" element={<ShoppingContact />} />
+          <Route path="store" element={<ShoppingStore />} />
         </Route>
         <Route path="/unauth-page" element={<UnauthPage />} />
         <Route path="*" element={<NotFound />} />

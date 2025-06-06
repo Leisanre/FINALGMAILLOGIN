@@ -15,7 +15,8 @@ import {
   Twitter,
   Instagram,
   Linkedin,
-  CheckCircle
+  CheckCircle,
+  BookOpen
 } from "lucide-react";
 import { useState } from "react";
 
@@ -31,15 +32,15 @@ function ShoppingContact() {
     {
       icon: Mail,
       title: "Email Us",
-      description: "Send us an email and we'll respond within 24 hours",
-      contact: "support@ecommerce.com",
+      description: "Send us an email about book recommendations or inquiries",
+      contact: "info@booksale.com",
       color: "text-blue-500",
       bgColor: "bg-blue-50"
     },
     {
       icon: Phone,
       title: "Call Us",
-      description: "Speak directly with our customer service team",
+      description: "Speak with our book experts and customer service team",
       contact: "+1 (555) 123-4567",
       color: "text-green-500",
       bgColor: "bg-green-50"
@@ -47,25 +48,25 @@ function ShoppingContact() {
     {
       icon: Facebook,
       title: "Facebook",
-      description: "Message us on Facebook for quick support",
-      contact: "@EcommerceStore",
+      description: "Follow us for book recommendations and updates",
+      contact: "@BookSaleStore",
       color: "text-blue-600",
       bgColor: "bg-blue-50"
     },
     {
       icon: Linkedin,
       title: "LinkedIn",
-      description: "Connect with us professionally on LinkedIn",
-      contact: "@EcommerceBusiness",
+      description: "Connect with us for business and educational resources",
+      contact: "@BookSaleBusiness",
       color: "text-blue-700",
       bgColor: "bg-blue-50"
     }
   ];
 
   const officeHours = [
-    { day: "Monday - Friday", hours: "9:00 AM - 6:00 PM EST" },
-    { day: "Saturday", hours: "10:00 AM - 4:00 PM EST" },
-    { day: "Sunday", hours: "Closed" }
+    { day: "Monday - Friday", hours: "9:00 AM - 8:00 PM" },
+    { day: "Saturday", hours: "9:00 AM - 9:00 PM" },
+    { day: "Sunday", hours: "10:00 AM - 6:00 PM" }
   ];
 
   const socialLinks = [
@@ -97,19 +98,20 @@ function ShoppingContact() {
         <div className="container mx-auto px-4">
           <div className="text-center max-w-4xl mx-auto">
             <h1 className="text-3xl md:text-5xl font-bold text-gray-900 mb-6">
-              Get In Touch
+              Contact BookSale
             </h1>
             <p className="text-lg md:text-xl text-gray-600 mb-8 leading-relaxed">
-              We're here to help! Reach out to us through any of the methods below and we'll get back to you as soon as possible.
+              Have questions about books, need recommendations, or want to inquire about our services?
+              Our book experts are here to help you find your next great read!
             </p>
             <div className="flex flex-wrap justify-center gap-4">
               <Badge variant="secondary" className="text-sm px-4 py-2">
-                <Clock className="w-4 h-4 mr-2" />
-                24/7 Support Available
+                <BookOpen className="w-4 h-4 mr-2" />
+                Book Experts Available
               </Badge>
               <Badge variant="secondary" className="text-sm px-4 py-2">
-                <Globe className="w-4 h-4 mr-2" />
-                Worldwide Service
+                <Clock className="w-4 h-4 mr-2" />
+                Extended Reading Hours
               </Badge>
             </div>
           </div>
@@ -120,7 +122,7 @@ function ShoppingContact() {
       <section className="py-12 md:py-16 bg-white">
         <div className="container mx-auto px-4">
           <h2 className="text-2xl md:text-3xl font-bold text-center mb-8 md:mb-12">
-            How Can We Help You?
+            Connect With Our BookSale Team
           </h2>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
             {contactMethods.map((method, index) => (
@@ -239,18 +241,18 @@ function ShoppingContact() {
                 <CardContent>
                   <div className="space-y-3">
                     <p className="text-gray-600">
-                      123 Commerce Street<br />
-                      Business District<br />
-                      New York, NY 10001<br />
-                      United States
+                      456 Book Avenue<br />
+                      Literary District<br />
+                      Manila, Philippines<br />
+                      1000
                     </p>
                     <div className="flex items-center gap-2 text-blue-600">
                       <Mail className="w-4 h-4" />
-                      <span>support@ecommerce.com</span>
+                      <span>info@booksale.com</span>
                     </div>
                     <div className="flex items-center gap-2 text-green-600">
                       <Phone className="w-4 h-4" />
-                      <span>+1 (555) 123-4567</span>
+                      <span>+63 (2) 8123-4567</span>
                     </div>
                   </div>
                 </CardContent>
@@ -295,7 +297,7 @@ function ShoppingContact() {
                     ))}
                   </div>
                   <p className="text-sm text-gray-600 mt-3">
-                    Stay connected for the latest updates and exclusive offers!
+                    Follow us for book recommendations, author events, and reading updates!
                   </p>
                 </CardContent>
               </Card>
@@ -312,7 +314,7 @@ function ShoppingContact() {
               Frequently Asked Questions
             </h2>
             <p className="text-gray-600 max-w-2xl mx-auto">
-              Quick answers to common questions. Can't find what you're looking for? Contact us directly!
+              Common questions about our books and services. Need more help? Our book experts are ready to assist!
             </p>
           </div>
           
@@ -322,9 +324,9 @@ function ShoppingContact() {
                 <div className="flex items-start gap-3">
                   <CheckCircle className="w-5 h-5 text-green-500 mt-1 flex-shrink-0" />
                   <div>
-                    <h3 className="font-semibold mb-2">How fast is shipping?</h3>
+                    <h3 className="font-semibold mb-2">Do you offer book delivery?</h3>
                     <p className="text-gray-600 text-sm">
-                      We offer free standard shipping (3-5 business days) and express shipping (1-2 business days) options.
+                      Yes! We offer book delivery nationwide. Standard delivery takes 3-5 business days, express delivery 1-2 days.
                     </p>
                   </div>
                 </div>
@@ -336,9 +338,9 @@ function ShoppingContact() {
                 <div className="flex items-start gap-3">
                   <CheckCircle className="w-5 h-5 text-green-500 mt-1 flex-shrink-0" />
                   <div>
-                    <h3 className="font-semibold mb-2">What's your return policy?</h3>
+                    <h3 className="font-semibold mb-2">Can I return or exchange books?</h3>
                     <p className="text-gray-600 text-sm">
-                      We offer 30-day returns on most items. Items must be in original condition with tags attached.
+                      Yes, we accept returns within 15 days. Books must be in original condition with no writing or damage.
                     </p>
                   </div>
                 </div>
@@ -350,9 +352,9 @@ function ShoppingContact() {
                 <div className="flex items-start gap-3">
                   <CheckCircle className="w-5 h-5 text-green-500 mt-1 flex-shrink-0" />
                   <div>
-                    <h3 className="font-semibold mb-2">Is my payment secure?</h3>
+                    <h3 className="font-semibold mb-2">Do you buy used books?</h3>
                     <p className="text-gray-600 text-sm">
-                      Yes! We use industry-standard SSL encryption to protect your payment information at all times.
+                      Yes! We purchase used books in good condition. Bring your books to any store for evaluation and quote.
                     </p>
                   </div>
                 </div>
@@ -364,9 +366,9 @@ function ShoppingContact() {
                 <div className="flex items-start gap-3">
                   <CheckCircle className="w-5 h-5 text-green-500 mt-1 flex-shrink-0" />
                   <div>
-                    <h3 className="font-semibold mb-2">Do you ship nationwide?</h3>
+                    <h3 className="font-semibold mb-2">Do you have book recommendations?</h3>
                     <p className="text-gray-600 text-sm">
-                      Yes, we ship to all states within the country. Shipping rates may vary by location and distance.
+                      Absolutely! Our book experts can help you find your next great read based on your interests and preferences.
                     </p>
                   </div>
                 </div>
