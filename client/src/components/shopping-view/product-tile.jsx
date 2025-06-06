@@ -32,7 +32,7 @@ function ShoppingProductTile({
           ) : null}
         </div>
         <CardContent className="p-2 xs:p-3">
-          <h2 className="text-sm xs:text-base font-semibold mb-1 line-clamp-2 leading-tight">{product?.title}</h2>
+          <h2 className="text-sm xs:text-base font-semibold mb-1 truncate leading-tight">{product?.title}</h2>
           <div className="flex justify-between items-center mb-2 text-xs text-muted-foreground">
             <span className="truncate max-w-[45%]">
               {categoryOptionsMap[product?.category]}
