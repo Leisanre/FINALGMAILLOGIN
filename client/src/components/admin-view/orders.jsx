@@ -21,12 +21,28 @@ import { Badge } from "../ui/badge";
 
 function AdminOrdersView() {
   const [openDetailsDialog, setOpenDetailsDialog] = useState(false);
+  const [selectedStatus, setSelectedStatus] = useState("all"); // New state for filtering
   const { orderList, orderDetails } = useSelector((state) => state.adminOrder);
   const dispatch = useDispatch();
 
   function handleFetchOrderDetails(getId) {
     dispatch(getOrderDetailsForAdmin(getId));
   }
+
+  // Filter orders based on selected status
+  const filteredOrders = selectedStatus === "all" 
+    ? orderList 
+    : orderList?.filter(order => order.orderStatus === selectedStatus);
+
+  // Handle status filter click
+  const handleStatusFilter = (status) => {
+    setSelectedStatus(status);
+  };
+
+  // Clear filter and show all orders
+  const handleShowAll = () => {
+    setSelectedStatus("all");
+  };
 
   useEffect(() => {
     dispatch(getAllOrdersForAdmin());
@@ -40,34 +56,67 @@ function AdminOrdersView() {
 
   return (
     <div className="grid grid-cols-1 gap-4 sm:gap-6 p-3 sm:p-4 md:p-6">
-      {/* Summary Cards - Order Status Counts */}
+      {/* Summary Cards - Order Status Counts (Clickable Filters) */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4 lg:gap-6">
         <SummaryCard
           title="Pending"
           value={orderList?.filter(order => order.orderStatus === "pending").length || 0}
           color="text-gray-600"
+          isActive={selectedStatus === "pending"}
+          onClick={() => handleStatusFilter("pending")}
         />
         <SummaryCard
           title="In Process"
           value={orderList?.filter(order => order.orderStatus === "inProcess").length || 0}
           color="text-blue-600"
+          isActive={selectedStatus === "inProcess"}
+          onClick={() => handleStatusFilter("inProcess")}
         />
         <SummaryCard
           title="In Shipping"
           value={orderList?.filter(order => order.orderStatus === "inShipping").length || 0}
           color="text-orange-600"
+          isActive={selectedStatus === "inShipping"}
+          onClick={() => handleStatusFilter("inShipping")}
         />
         <SummaryCard
           title="Delivered"
           value={orderList?.filter(order => order.orderStatus === "delivered").length || 0}
           color="text-green-600"
+          isActive={selectedStatus === "delivered"}
+          onClick={() => handleStatusFilter("delivered")}
         />
+      </div>
+
+      {/* Filter Status Display and Clear Button */}
+      <div className="flex items-center justify-between">
+        <div className="flex items-center gap-2">
+          <p className="text-sm text-muted-foreground">
+            {selectedStatus === "all" ? "Showing all orders" : `Showing ${selectedStatus} orders`}
+          </p>
+          {selectedStatus !== "all" && (
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={handleShowAll}
+              className="text-xs"
+            >
+              Show All
+            </Button>
+          )}
+        </div>
+        <p className="text-sm text-muted-foreground">
+          {filteredOrders?.length || 0} orders
+        </p>
       </div>
 
       {/* Orders Table - Responsive Design */}
       <Card className="hover:shadow-lg transition-shadow duration-200">
         <CardHeader className="p-3 sm:p-4 lg:p-6">
-          <CardTitle className="text-base sm:text-lg lg:text-xl">All Orders ({orderList?.length || 0})</CardTitle>
+          <CardTitle className="text-base sm:text-lg lg:text-xl">
+            {selectedStatus === "all" ? "All Orders" : `${selectedStatus.charAt(0).toUpperCase() + selectedStatus.slice(1)} Orders`} 
+            ({filteredOrders?.length || 0})
+          </CardTitle>
         </CardHeader>
         <CardContent className="p-3 sm:p-4 lg:p-6 pt-0">
           {/* Desktop Table View */}
@@ -85,8 +134,8 @@ function AdminOrdersView() {
                 </TableRow>
               </TableHeader>
               <TableBody>
-                {orderList && orderList.length > 0
-                  ? orderList.map((orderItem) => (
+                {filteredOrders && filteredOrders.length > 0
+                  ? filteredOrders.map((orderItem) => (
                       <TableRow key={orderItem?._id} className="hover:bg-muted/50">
                         <TableCell className="text-xs sm:text-sm lg:text-base font-mono">
                           {orderItem?._id.slice(-8)}
@@ -136,7 +185,7 @@ function AdminOrdersView() {
                   : (
                       <TableRow>
                         <TableCell colSpan={5} className="text-center py-8 text-muted-foreground">
-                          No orders found
+                          {selectedStatus === "all" ? "No orders found" : `No ${selectedStatus} orders found`}
                         </TableCell>
                       </TableRow>
                     )}
@@ -146,8 +195,8 @@ function AdminOrdersView() {
 
           {/* Mobile Card View */}
           <div className="md:hidden space-y-3 sm:space-y-4">
-            {orderList && orderList.length > 0 ? (
-              orderList.map((orderItem) => (
+            {filteredOrders && filteredOrders.length > 0 ? (
+              filteredOrders.map((orderItem) => (
                 <Card key={orderItem?._id} className="border-l-4 border-l-primary hover:shadow-md transition-shadow">
                   <CardContent className="p-3 sm:p-4">
                     <div className="space-y-2 sm:space-y-3">
@@ -212,7 +261,9 @@ function AdminOrdersView() {
             ) : (
               <Card>
                 <CardContent className="p-6 text-center">
-                  <p className="text-muted-foreground">No orders found</p>
+                  <p className="text-muted-foreground">
+                    {selectedStatus === "all" ? "No orders found" : `No ${selectedStatus} orders found`}
+                  </p>
                 </CardContent>
               </Card>
             )}
@@ -234,9 +285,14 @@ function AdminOrdersView() {
   );
 }
 
-function SummaryCard({ title, value, color }) {
+function SummaryCard({ title, value, color, isActive, onClick }) {
   return (
-    <Card className="hover:shadow-lg transition-shadow duration-200">
+    <Card 
+      className={`hover:shadow-lg transition-all duration-200 cursor-pointer ${
+        isActive ? 'ring-2 ring-primary shadow-lg scale-105' : 'hover:scale-105'
+      }`}
+      onClick={onClick}
+    >
       <CardHeader className="p-3 sm:p-4 lg:p-6">
         <CardTitle className="text-sm sm:text-base lg:text-lg text-muted-foreground font-medium">{title}</CardTitle>
       </CardHeader>
