@@ -7,6 +7,8 @@ const initialState = {
   genreList: [],
   categoryList: [],
   brandList: [],
+  topGenres: [],
+  topProducts: [],
 };
 
 // FETCH and ADD operations
@@ -77,6 +79,16 @@ export const deleteBrand = createAsyncThunk("common/deleteBrand", async (id) => 
   }
 });
 
+export const getTopGenres = createAsyncThunk("common/getTopGenres", async () => {
+  const response = await axios.get("http://localhost:5000/api/common/genre-stats");
+  return response.data;
+});
+
+export const getTopProducts = createAsyncThunk("common/getTopProducts", async () => {
+  const response = await axios.get("http://localhost:5000/api/common/top-products");
+  return response.data;
+});
+
 
 // Slice
 const commonSlice = createSlice({
@@ -142,6 +154,16 @@ extraReducers: (builder) => {
     })
     .addCase(deleteBrand.rejected, (state, action) => {
       console.error('Delete brand rejected:', action.error);
+    })
+
+    // TOP GENRES
+    .addCase(getTopGenres.fulfilled, (state, action) => {
+      state.topGenres = action.payload.data;
+    })
+
+    // TOP PRODUCTS
+    .addCase(getTopProducts.fulfilled, (state, action) => {
+      state.topProducts = action.payload.data;
     });
 },
 });

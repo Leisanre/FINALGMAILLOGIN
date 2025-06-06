@@ -3,25 +3,18 @@ import bannerOne from "../../assets/banner-1.webp";
 import bannerTwo from "../../assets/banner-2.webp";
 import bannerThree from "../../assets/banner-3.webp";
 import {
-  Airplay,
   BabyIcon,
   ChevronLeftIcon,
   ChevronRightIcon,
   CloudLightning,
-  Heater,
-  Images,
-  Shirt,
   ShirtIcon,
-  ShoppingBasket,
   UmbrellaIcon,
-  WashingMachine,
   WatchIcon,
 } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import {
-  fetchAllFilteredProducts,
   fetchProductDetails,
 } from "@/store/shop/products-slice";
 import ShoppingProductTile from "@/components/shopping-view/product-tile";
@@ -29,30 +22,22 @@ import { useNavigate } from "react-router-dom";
 import { addToCart, fetchCartItems } from "@/store/shop/cart-slice";
 import { useToast } from "@/components/ui/use-toast";
 import ProductDetailsDialog from "@/components/shopping-view/product-details";
-import { getFeatureImages } from "@/store/common-slice";
+import { getFeatureImages, getTopGenres, getTopProducts } from "@/store/common-slice";
 
-const categoriesWithIcon = [
-  { id: "romance", label: "Romance", icon: ShirtIcon },
-  { id: "action", label: "Action", icon: CloudLightning },
-  { id: "kids", label: "Kids", icon: BabyIcon },
-  { id: "crime", label: "Crime", icon: WatchIcon },
-  { id: "History", label: "History", icon: UmbrellaIcon },
+const genreIcons = [
+  ShirtIcon,
+  CloudLightning,
+  BabyIcon,
+  WatchIcon,
+  UmbrellaIcon,
 ];
 
-const brandsWithIcon = [
-  { id: "nike", label: "Nike", icon: Shirt },
-  { id: "adidas", label: "Adidas", icon: WashingMachine },
-  { id: "puma", label: "Puma", icon: ShoppingBasket },
-  { id: "levi", label: "Levi's", icon: Airplay },
-  { id: "zara", label: "Zara", icon: Images },
-  { id: "h&m", label: "H&M", icon: Heater },
-];
 function ShoppingHome() {
   const [currentSlide, setCurrentSlide] = useState(0);
-  const { productList, productDetails } = useSelector(
+  const { productDetails } = useSelector(
     (state) => state.shopProducts
   );
-  const { featureImageList } = useSelector((state) => state.commonFeature);
+  const { featureImageList, topGenres, topProducts } = useSelector((state) => state.commonFeature);
 
   const [openDetailsDialog, setOpenDetailsDialog] = useState(false);
 
@@ -65,7 +50,7 @@ function ShoppingHome() {
   function handleNavigateToListingPage(getCurrentItem, section) {
     sessionStorage.removeItem("filters");
     const currentFilter = {
-      [section]: [getCurrentItem.id],
+      [section]: [getCurrentItem.name || getCurrentItem.id],
     };
 
     sessionStorage.setItem("filters", JSON.stringify(currentFilter));
@@ -105,20 +90,21 @@ function ShoppingHome() {
     return () => clearInterval(timer);
   }, [featureImageList]);
 
-  useEffect(() => {
-    dispatch(
-      fetchAllFilteredProducts({
-        filterParams: {},
-        sortParams: "price-lowtohigh",
-      })
-    );
-  }, [dispatch]);
-
-  console.log(productList, "productList");
 
   useEffect(() => {
     dispatch(getFeatureImages());
+    dispatch(getTopGenres());
+    dispatch(getTopProducts());
   }, [dispatch]);
+
+  // Create dynamic genres with icons
+  const dynamicGenres = topGenres.map((genre, index) => ({
+    id: genre.name.toLowerCase(),
+    name: genre.name,
+    label: genre.name,
+    sales: genre.sales,
+    icon: genreIcons[index % genreIcons.length] // Cycle through available icons
+  }));
 
   return (
     <div className="flex flex-col min-h-screen">
@@ -187,49 +173,35 @@ function ShoppingHome() {
           </div>
         </div>
       </div>
-      {/* Shop by Category Section */}
+      {/* Shop by Genre Section */}
       <section className="py-6 xs:py-8 sm:py-10 md:py-12 bg-gray-50">
         <div className="container mx-auto px-2 xs:px-3 sm:px-4">
           <h2 className="text-lg xs:text-xl sm:text-2xl md:text-3xl font-bold text-center mb-4 xs:mb-6 sm:mb-8">
-            Shop by category
+            Shop by Genre
           </h2>
-          <div className="grid grid-cols-2 xs:grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-2 xs:gap-3 sm:gap-4">
-            {categoriesWithIcon.map((categoryItem) => (
-              <Card
-                key={categoryItem.id}
-                onClick={() =>
-                  handleNavigateToListingPage(categoryItem, "category")
-                }
-                className="cursor-pointer hover:shadow-lg transition-shadow responsive-card"
-              >
-                <CardContent className="flex flex-col items-center justify-center p-2 xs:p-3 sm:p-4 md:p-6">
-                  <categoryItem.icon className="w-6 h-6 xs:w-8 xs:h-8 sm:w-10 sm:h-10 md:w-12 md:h-12 mb-2 xs:mb-3 sm:mb-4 text-primary" />
-                  <span className="font-bold text-xs xs:text-sm sm:text-base text-center">{categoryItem.label}</span>
-                </CardContent>
-              </Card>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* Shop by Type Section */}
-      <section className="py-6 xs:py-8 sm:py-10 md:py-12 bg-gray-50">
-        <div className="container mx-auto px-2 xs:px-3 sm:px-4">
-          <h2 className="text-lg xs:text-xl sm:text-2xl md:text-3xl font-bold text-center mb-4 xs:mb-6 sm:mb-8">Shop by Type</h2>
-          <div className="grid grid-cols-2 xs:grid-cols-3 sm:grid-cols-4 md:grid-cols-5 lg:grid-cols-6 gap-2 xs:gap-3 sm:gap-4">
-            {brandsWithIcon.map((brandItem) => (
-              <Card
-                key={brandItem.id}
-                onClick={() => handleNavigateToListingPage(brandItem, "brand")}
-                className="cursor-pointer hover:shadow-lg transition-shadow responsive-card"
-              >
-                <CardContent className="flex flex-col items-center justify-center p-2 xs:p-3 sm:p-4 md:p-6">
-                  <brandItem.icon className="w-6 h-6 xs:w-8 xs:h-8 sm:w-10 sm:h-10 md:w-12 md:h-12 mb-2 xs:mb-3 sm:mb-4 text-primary" />
-                  <span className="font-bold text-xs xs:text-sm sm:text-base text-center">{brandItem.label}</span>
-                </CardContent>
-              </Card>
-            ))}
-          </div>
+          {dynamicGenres.length > 0 ? (
+            <div className="grid grid-cols-2 xs:grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-2 xs:gap-3 sm:gap-4">
+              {dynamicGenres.map((genreItem) => (
+                <Card
+                  key={genreItem.id}
+                  onClick={() =>
+                    handleNavigateToListingPage(genreItem, "genre")
+                  }
+                  className="cursor-pointer hover:shadow-lg transition-shadow responsive-card"
+                >
+                  <CardContent className="flex flex-col items-center justify-center p-2 xs:p-3 sm:p-4 md:p-6">
+                    <genreItem.icon className="w-6 h-6 xs:w-8 xs:h-8 sm:w-10 sm:h-10 md:w-12 md:h-12 mb-2 xs:mb-3 sm:mb-4 text-primary" />
+                    <span className="font-bold text-xs xs:text-sm sm:text-base text-center">{genreItem.label}</span>
+                    <span className="text-xs text-gray-500 mt-1">{genreItem.sales} sold</span>
+                  </CardContent>
+                </Card>
+              ))}
+            </div>
+          ) : (
+            <div className="text-center text-gray-500">
+              <p>No genre statistics available yet. Genres will appear as orders are processed.</p>
+            </div>
+          )}
         </div>
       </section>
 
@@ -237,20 +209,24 @@ function ShoppingHome() {
       <section className="py-6 xs:py-8 sm:py-10 md:py-12">
         <div className="container mx-auto px-2 xs:px-3 sm:px-4">
           <h2 className="text-lg xs:text-xl sm:text-2xl md:text-3xl font-bold text-center mb-4 xs:mb-6 sm:mb-8">
-            Feature Products
+            Top Selling Books
           </h2>
-          <div className="product-tile-grid">
-            {productList && productList.length > 0
-              ? productList.map((productItem) => (
-                  <ShoppingProductTile
-                    key={productItem.id}
-                    handleGetProductDetails={handleGetProductDetails}
-                    product={productItem}
-                    handleAddtoCart={handleAddtoCart}
-                  />
-                ))
-              : null}
-          </div>
+          {topProducts && topProducts.length > 0 ? (
+            <div className="product-tile-grid">
+              {topProducts.map((productItem) => (
+                <ShoppingProductTile
+                  key={productItem._id}
+                  handleGetProductDetails={handleGetProductDetails}
+                  product={productItem}
+                  handleAddtoCart={handleAddtoCart}
+                />
+              ))}
+            </div>
+          ) : (
+            <div className="text-center text-gray-500">
+              <p>No top selling books available yet. Books will appear as orders are processed.</p>
+            </div>
+          )}
         </div>
       </section>
       <ProductDetailsDialog
