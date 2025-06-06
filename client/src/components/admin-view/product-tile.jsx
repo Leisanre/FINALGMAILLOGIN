@@ -1,5 +1,13 @@
 import { Button } from "../ui/button";
 import { Card, CardContent, CardFooter } from "../ui/card";
+import { Badge } from "../ui/badge";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+} from "../ui/dialog";
+import { useState } from "react";
 
 function AdminProductTile({
   product,
@@ -8,6 +16,7 @@ function AdminProductTile({
   setCurrentEditedId,
   handleDelete,
 }) {
+  const [showImageDialog, setShowImageDialog] = useState(false);
   return (
     <Card className="w-full max-w-sm mx-auto">
       <div>
@@ -15,26 +24,87 @@ function AdminProductTile({
           <img
             src={product?.image}
             alt={product?.title}
-            className="w-full h-[300px] object-cover rounded-t-lg"
+            className="w-full h-[250px] object-cover rounded-t-lg cursor-pointer hover:opacity-90 transition-opacity"
+            onClick={() => setShowImageDialog(true)}
+            title="Click to enlarge image"
           />
+          {/* Stock Status Badge */}
+          {product?.totalStock === 0 ? (
+            <Badge className="absolute top-2 left-2 bg-red-500 hover:bg-red-600">
+              Out of Stock
+            </Badge>
+          ) : product?.totalStock < 10 ? (
+            <Badge className="absolute top-2 left-2 bg-orange-500 hover:bg-orange-600">
+              Low Stock
+            </Badge>
+          ) : product?.salePrice > 0 ? (
+            <Badge className="absolute top-2 left-2 bg-green-500 hover:bg-green-600">
+              On Sale
+            </Badge>
+          ) : null}
         </div>
-        <CardContent>
-          <h2 className="text-xl font-bold mb-2 mt-2">{product?.title}</h2>
-          <div className="flex justify-between items-center mb-2">
+        <CardContent className="p-4">
+          <h2 className="text-lg font-bold mb-2 line-clamp-2">{product?.title}</h2>
+          
+          {/* Description */}
+          {product?.description && (
+            <p className="text-sm text-gray-600 mb-3 line-clamp-2">
+              {product.description}
+            </p>
+          )}
+          
+          {/* Category, Brand, Genre */}
+          <div className="space-y-1 mb-3">
+            {product?.category && (
+              <div className="flex items-center gap-2">
+                <span className="text-xs font-medium text-gray-500">Category:</span>
+                <span className="text-xs text-gray-700">{product.category}</span>
+              </div>
+            )}
+            {product?.brand && (
+              <div className="flex items-center gap-2">
+                <span className="text-xs font-medium text-gray-500">Brand:</span>
+                <span className="text-xs text-gray-700">{product.brand}</span>
+              </div>
+            )}
+            {product?.genre && (
+              <div className="flex items-center gap-2">
+                <span className="text-xs font-medium text-gray-500">Genre:</span>
+                <span className="text-xs text-gray-700">{product.genre}</span>
+              </div>
+            )}
+          </div>
+
+          {/* Stock Information */}
+          <div className="flex items-center gap-2 mb-3">
+            <span className="text-xs font-medium text-gray-500">Stock:</span>
+            <span className={`text-xs font-semibold ${
+              product?.totalStock === 0 ? 'text-red-600' :
+              product?.totalStock < 10 ? 'text-orange-600' : 'text-green-600'
+            }`}>
+              {product?.totalStock} units
+            </span>
+          </div>
+          
+          {/* Price Information */}
+          <div className="flex justify-between items-center">
             <span
               className={`${
-                product?.salePrice > 0 ? "line-through" : ""
-              } text-lg font-semibold text-primary`}
+                product?.salePrice > 0 ? "line-through text-gray-500" : "text-primary"
+              } text-lg font-semibold`}
             >
               ₱{product?.price}
             </span>
             {product?.salePrice > 0 ? (
-              <span className="text-lg font-bold">₱{product?.salePrice}</span>
+              <span className="text-lg font-bold text-primary">₱{product?.salePrice}</span>
             ) : null}
           </div>
         </CardContent>
-        <CardFooter className="flex justify-between items-center">
+        <CardFooter className="flex justify-between items-center gap-2 p-4 pt-0">
           <Button
+            variant="outline"
+            size="sm"
+            className="flex-1"
             onClick={() => {
               setOpenCreateProductsDialog(true);
               setCurrentEditedId(product?._id);
@@ -43,9 +113,45 @@ function AdminProductTile({
           >
             Edit
           </Button>
-          <Button onClick={() => handleDelete(product?._id)}>Delete</Button>
+          <Button
+            variant="destructive"
+            size="sm"
+            className="flex-1"
+            onClick={() => handleDelete(product?._id)}
+          >
+            Delete
+          </Button>
         </CardFooter>
       </div>
+
+      {/* Image Enlargement Dialog */}
+      <Dialog open={showImageDialog} onOpenChange={setShowImageDialog}>
+        <DialogContent className="max-w-4xl max-h-[90vh] p-0">
+          <DialogHeader className="p-4 pb-2">
+            <DialogTitle className="text-lg font-semibold">
+              {product?.title}
+            </DialogTitle>
+          </DialogHeader>
+          <div className="flex justify-center items-center p-4 pt-0">
+            <img
+              src={product?.image}
+              alt={product?.title}
+              className="max-w-full max-h-[70vh] object-contain rounded-lg shadow-lg"
+              onClick={() => setShowImageDialog(false)}
+            />
+          </div>
+          <div className="p-4 pt-0 text-center">
+            <p className="text-sm text-gray-500 mb-2">Click image or press ESC to close</p>
+            <Button
+              variant="outline"
+              onClick={() => setShowImageDialog(false)}
+              className="px-6"
+            >
+              Close
+            </Button>
+          </div>
+        </DialogContent>
+      </Dialog>
     </Card>
   );
 }

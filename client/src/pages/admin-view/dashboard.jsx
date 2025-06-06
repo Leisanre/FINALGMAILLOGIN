@@ -164,8 +164,7 @@ export default function AdminDashboard() {
 
     return Object.entries(bookStats)
       .map(([title, sales]) => ({ title, sales }))
-      .sort((a, b) => b.sales - a.sales)
-      .slice(0, 5);
+      .sort((a, b) => b.sales - a.sales);
   };
 
   // Generate low inventory items from product list
@@ -176,14 +175,15 @@ export default function AdminDashboard() {
         title: product.title,
         quantity: product.totalStock || 0
       }))
-      .sort((a, b) => a.quantity - b.quantity)
-      .slice(0, 5);
+      .sort((a, b) => a.quantity - b.quantity);
   };
 
   const chartData = generateChartData();
   const genreSalesData = generateGenreSales();
-  const topSellingBooks = generateTopSellingBooks();
-  const lowInventory = generateLowInventory();
+  const allTopSellingBooks = generateTopSellingBooks();
+  const allLowInventory = generateLowInventory();
+  const topSellingBooks = allTopSellingBooks.slice(0, 5);
+  const lowInventory = allLowInventory.slice(0, 5);
 
   const monthlyRevenue = {
     labels: chartData.months,
@@ -227,6 +227,7 @@ export default function AdminDashboard() {
   const [imageLoadingState, setImageLoadingState] = useState(false);
   const [showDeleteDialog, setShowDeleteDialog] = useState(false);
   const [imageToDelete, setImageToDelete] = useState(null);
+  const [viewMoreDialog, setViewMoreDialog] = useState({ open: false, type: '', data: [] });
   const { toast } = useToast();
 
   const handleUploadFeatureImage = () => {
@@ -414,7 +415,14 @@ export default function AdminDashboard() {
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6">
         <Card className="hover:shadow-lg transition-shadow duration-200">
           <CardHeader className="p-3 sm:p-4 lg:p-6">
-            <CardTitle className="text-base sm:text-lg lg:text-xl">Top Selling Books</CardTitle>
+            <div className="flex justify-between items-center">
+              <CardTitle className="text-base sm:text-lg lg:text-xl">Top Selling Books</CardTitle>
+              {allTopSellingBooks.length > 5 && (
+                <span className="text-xs text-muted-foreground">
+                  Showing top 5 of {allTopSellingBooks.length} books
+                </span>
+              )}
+            </div>
           </CardHeader>
           <CardContent className="p-3 sm:p-4 lg:p-6 pt-0">
             <ul className="divide-y divide-muted-foreground/20">
@@ -425,12 +433,35 @@ export default function AdminDashboard() {
                 </li>
               ))}
             </ul>
+            {allTopSellingBooks.length > 5 && (
+              <div className="mt-4 text-center">
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => setViewMoreDialog({
+                    open: true,
+                    type: 'Top Selling Books',
+                    data: allTopSellingBooks
+                  })}
+                  className="text-xs"
+                >
+                  View More ({allTopSellingBooks.length - 5} more)
+                </Button>
+              </div>
+            )}
           </CardContent>
         </Card>
 
         <Card className="hover:shadow-lg transition-shadow duration-200">
           <CardHeader className="p-3 sm:p-4 lg:p-6">
-            <CardTitle className="text-red-600 text-base sm:text-lg lg:text-xl">Low Inventory Alerts</CardTitle>
+            <div className="flex justify-between items-center">
+              <CardTitle className="text-red-600 text-base sm:text-lg lg:text-xl">Low Inventory Alerts</CardTitle>
+              {allLowInventory.length > 5 && (
+                <span className="text-xs text-muted-foreground">
+                  Showing top 5 of {allLowInventory.length} items
+                </span>
+              )}
+            </div>
           </CardHeader>
           <CardContent className="p-3 sm:p-4 lg:p-6 pt-0">
             <ul className="divide-y divide-muted-foreground/20">
@@ -441,6 +472,22 @@ export default function AdminDashboard() {
                 </li>
               ))}
             </ul>
+            {allLowInventory.length > 5 && (
+              <div className="mt-4 text-center">
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => setViewMoreDialog({
+                    open: true,
+                    type: 'Low Inventory Alerts',
+                    data: allLowInventory
+                  })}
+                  className="text-xs text-red-600 border-red-600 hover:bg-red-50"
+                >
+                  View More ({allLowInventory.length - 5} more)
+                </Button>
+              </div>
+            )}
           </CardContent>
         </Card>
       </div>
@@ -521,6 +568,40 @@ export default function AdminDashboard() {
               onClick={handleConfirmDelete}
             >
               Delete
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* View More Dialog */}
+      <Dialog open={viewMoreDialog.open} onOpenChange={(open) => setViewMoreDialog({ ...viewMoreDialog, open })}>
+        <DialogContent className="max-w-md">
+          <DialogHeader>
+            <DialogTitle>{viewMoreDialog.type}</DialogTitle>
+            <DialogDescription>
+              Showing all {viewMoreDialog.data?.length || 0} items
+            </DialogDescription>
+          </DialogHeader>
+          <div className="max-h-96 overflow-y-auto">
+            <ul className="space-y-2">
+              {viewMoreDialog.data?.map((item, index) => (
+                <li key={item.title || index} className="flex justify-between items-center p-2 rounded-md hover:bg-gray-50">
+                  <span className="text-sm flex-1 truncate pr-2">{item.title}</span>
+                  <span className={`text-sm font-medium whitespace-nowrap ${
+                    viewMoreDialog.type === 'Low Inventory Alerts' ? 'text-red-600' : ''
+                  }`}>
+                    {viewMoreDialog.type === 'Top Selling Books' ? `${item.sales} sold` : `${item.quantity} left`}
+                  </span>
+                </li>
+              ))}
+            </ul>
+          </div>
+          <DialogFooter>
+            <Button
+              variant="outline"
+              onClick={() => setViewMoreDialog({ ...viewMoreDialog, open: false })}
+            >
+              Close
             </Button>
           </DialogFooter>
         </DialogContent>
