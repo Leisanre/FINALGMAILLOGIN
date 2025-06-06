@@ -65,6 +65,7 @@ function AdminProducts() {
   const [productToDelete, setProductToDelete] = useState(null);
   const [showItemDeleteDialog, setShowItemDeleteDialog] = useState(false);
   const [itemToDelete, setItemToDelete] = useState(null);
+  const [viewMoreDialog, setViewMoreDialog] = useState({ open: false, type: '', list: [], deleteAction: null, getAction: null });
 
   const { productList } = useSelector((state) => state.adminProducts);
   // Make sure the slice name here matches your store setup (commonSlice or commonFeature)
@@ -289,20 +290,45 @@ function AdminProducts() {
                 <Button type="submit">Add</Button>
               </form>
               {list?.length > 0 && (
-                <ul className="list-disc pl-5 space-y-1 text-sm text-gray-600 max-h-40 overflow-auto">
-                  {list.map((item) => (
-                    <li key={item._id || item} className="flex justify-between items-center">
-                      <span>{item.name || item}</span>
-                      <button
-                        onClick={() => handleItemDeleteClick(item, deleteAction, getAction, label)}
-                        className="ml-2 text-red-600 hover:underline"
-                        type="button"
+                <div>
+                  <div className="flex justify-between items-center mb-2">
+                    <span className="text-xs text-gray-500">
+                      {list.length > 3 ? `Showing 3 of ${list.length} items` : `${list.length} item${list.length !== 1 ? 's' : ''}`}
+                    </span>
+                  </div>
+                  <ul className="list-disc pl-5 space-y-1 text-sm text-gray-600">
+                    {list.slice(0, 3).map((item) => (
+                      <li key={item._id || item} className="flex justify-between items-center">
+                        <span>{item.name || item}</span>
+                        <button
+                          onClick={() => handleItemDeleteClick(item, deleteAction, getAction, label)}
+                          className="ml-2 text-red-600 hover:underline"
+                          type="button"
+                        >
+                          Delete
+                        </button>
+                      </li>
+                    ))}
+                  </ul>
+                  {list.length > 3 && (
+                    <div className="mt-3 text-center">
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => setViewMoreDialog({
+                          open: true,
+                          type: label,
+                          list: list,
+                          deleteAction: deleteAction,
+                          getAction: getAction
+                        })}
+                        className="text-xs"
                       >
-                        Delete
-                      </button>
-                    </li>
-                  ))}
-                </ul>
+                        View More ({list.length - 3} more)
+                      </Button>
+                    </div>
+                  )}
+                </div>
               )}
             </div>
           )
@@ -410,6 +436,45 @@ function AdminProducts() {
               onClick={handleConfirmItemDelete}
             >
               Delete
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* View More Dialog */}
+      <Dialog open={viewMoreDialog.open} onOpenChange={(open) => setViewMoreDialog({ ...viewMoreDialog, open })}>
+        <DialogContent className="max-w-md">
+          <DialogHeader>
+            <DialogTitle>All {viewMoreDialog.type}s</DialogTitle>
+            <DialogDescription>
+              Showing all {viewMoreDialog.list?.length || 0} {viewMoreDialog.type?.toLowerCase()}s
+            </DialogDescription>
+          </DialogHeader>
+          <div className="max-h-96 overflow-y-auto">
+            <ul className="space-y-2">
+              {viewMoreDialog.list?.map((item) => (
+                <li key={item._id || item} className="flex justify-between items-center p-2 rounded-md hover:bg-gray-50">
+                  <span className="text-sm">{item.name || item}</span>
+                  <button
+                    onClick={() => {
+                      handleItemDeleteClick(item, viewMoreDialog.deleteAction, viewMoreDialog.getAction, viewMoreDialog.type);
+                      setViewMoreDialog({ ...viewMoreDialog, open: false });
+                    }}
+                    className="text-xs text-red-600 hover:text-red-800 hover:underline"
+                    type="button"
+                  >
+                    Delete
+                  </button>
+                </li>
+              ))}
+            </ul>
+          </div>
+          <DialogFooter>
+            <Button
+              variant="outline"
+              onClick={() => setViewMoreDialog({ ...viewMoreDialog, open: false })}
+            >
+              Close
             </Button>
           </DialogFooter>
         </DialogContent>

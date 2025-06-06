@@ -26,6 +26,7 @@ function AdminFeatures() {
   const [imageLoadingState, setImageLoadingState] = useState(false);
   const [showDeleteDialog, setShowDeleteDialog] = useState(false);
   const [imageToDelete, setImageToDelete] = useState(null);
+  const [showAllImages, setShowAllImages] = useState(false);
 
   useEffect(() => {
     dispatch(getFeatureImages());
@@ -99,10 +100,17 @@ function AdminFeatures() {
         {imageLoadingState ? "Uploading..." : "Upload"}
       </Button>
       <div className="flex flex-col gap-4 mt-5">
-        <h1 className="text-2xl font-bold">Featured Images</h1>
+        <div className="flex items-center justify-between">
+          <h1 className="text-2xl font-bold">Featured Images</h1>
+          {featureImageList && featureImageList.length > 3 && (
+            <span className="text-sm text-muted-foreground">
+              {showAllImages ? `Showing all ${featureImageList.length} images` : `Showing 3 of ${featureImageList.length} images`}
+            </span>
+          )}
+        </div>
         <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
           {featureImageList && featureImageList.length > 0
-            ? featureImageList.map((featureItem) => (
+            ? (showAllImages ? featureImageList : featureImageList.slice(0, 3)).map((featureItem) => (
                 <div
                   key={featureItem._id}
                   className="relative group overflow-hidden rounded-lg border"
@@ -125,6 +133,17 @@ function AdminFeatures() {
               ))
             : <p className="text-muted-foreground">No feature images uploaded yet.</p>}
         </div>
+        {featureImageList && featureImageList.length > 3 && (
+          <div className="flex justify-center mt-4">
+            <Button
+              variant="outline"
+              onClick={() => setShowAllImages(!showAllImages)}
+              className="px-6"
+            >
+              {showAllImages ? "Show Less" : `View More (${featureImageList.length - 3} more)`}
+            </Button>
+          </div>
+        )}
       </div>
 
       {/* Delete Confirmation Dialog */}
