@@ -114,8 +114,13 @@ function AdminOrdersView() {
       <Card className="hover:shadow-lg transition-shadow duration-200">
         <CardHeader className="p-3 sm:p-4 lg:p-6">
           <CardTitle className="text-base sm:text-lg lg:text-xl">
-            {selectedStatus === "all" ? "All Orders" : `${selectedStatus.charAt(0).toUpperCase() + selectedStatus.slice(1)} Orders`} 
-            ({filteredOrders?.length || 0})
+            {selectedStatus === "all"
+              ? "All Orders"
+              : selectedStatus === "inProcess"
+              ? "In Process Orders"
+              : selectedStatus === "inShipping"
+              ? "In Shipping Orders"
+              : `${selectedStatus.charAt(0).toUpperCase() + selectedStatus.slice(1)} Orders`}
           </CardTitle>
         </CardHeader>
         <CardContent className="p-3 sm:p-4 lg:p-6 pt-0">
