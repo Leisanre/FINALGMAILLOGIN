@@ -29,6 +29,8 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { addFeatureImage, getFeatureImages, deleteFeatureImage } from "@/store/common-slice";
+import { getAllOrdersForAdmin } from "@/store/admin/order-slice";
+import { fetchAllProducts } from "@/store/admin/products-slice";
 import { useDispatch, useSelector } from "react-redux";
 import { useToast } from "@/components/ui/use-toast";
 
@@ -45,12 +47,36 @@ ChartJS.register(
 );
 
 export default function AdminDashboard() {
-  const summaryStats = {
-    totalSales: 75250,
-    totalOrders: 1890,
-    activeItems: 540,
-    customers: 1320,
+  // Get data from Redux store
+  const dispatch = useDispatch();
+  const { orderList } = useSelector((state) => state.adminOrder);
+  const { productList } = useSelector((state) => state.adminProducts);
+  const { featureImageList } = useSelector((state) => state.commonFeature);
+  
+  // Calculate dynamic statistics
+  const calculateStats = () => {
+    // Calculate total sales from delivered orders
+    const deliveredOrders = orderList?.filter(order => order.orderStatus === 'delivered') || [];
+    const totalSales = deliveredOrders.reduce((sum, order) => sum + (order.totalAmount || 0), 0);
+    
+    // Count total delivered orders
+    const totalOrders = deliveredOrders.length;
+    
+    // Count active products
+    const activeItems = productList?.length || 0;
+    
+    // Get customer visits (should be tracked on customer-facing pages, not admin)
+    const customerVisits = parseInt(localStorage.getItem('customerVisits') || '0');
+    
+    return {
+      totalSales,
+      totalOrders,
+      activeItems,
+      visits: customerVisits,
+    };
   };
+
+  const summaryStats = calculateStats();
 
   const monthlyRevenue = {
     labels: ["Jan", "Feb", "Mar", "Apr", "May", "Jun"],
@@ -116,9 +142,7 @@ export default function AdminDashboard() {
   const [imageLoadingState, setImageLoadingState] = useState(false);
   const [showDeleteDialog, setShowDeleteDialog] = useState(false);
   const [imageToDelete, setImageToDelete] = useState(null);
-  const dispatch = useDispatch();
   const { toast } = useToast();
-  const { featureImageList } = useSelector((state) => state.commonFeature);
 
   const handleAddItem = async (e) => {
     e.preventDefault();
@@ -202,7 +226,17 @@ export default function AdminDashboard() {
   };
 
   useEffect(() => {
+    // Fetch all necessary data on component mount
     dispatch(getFeatureImages());
+    dispatch(getAllOrdersForAdmin());
+    dispatch(fetchAllProducts());
+    
+    // Initialize customer visits counter (read-only for admin)
+    // This should be incremented on customer-facing pages only
+    const customerVisits = localStorage.getItem('customerVisits');
+    if (!customerVisits) {
+      localStorage.setItem('customerVisits', '0');
+    }
   }, [dispatch]);
 
   return (
@@ -212,7 +246,7 @@ export default function AdminDashboard() {
         <SummaryCard title="Total Sales" value={`$${summaryStats.totalSales.toLocaleString()}`} />
         <SummaryCard title="Total Orders" value={summaryStats.totalOrders} />
         <SummaryCard title="Active Items" value={summaryStats.activeItems} />
-        <SummaryCard title="Customers" value={summaryStats.customers} />
+        <SummaryCard title="Visits" value={summaryStats.visits.toLocaleString()} />
       </div>
 
       {/* Charts Section - Responsive like product grid */}
