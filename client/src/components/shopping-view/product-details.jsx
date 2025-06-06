@@ -16,6 +16,7 @@ import { addReview, getReviews } from "@/store/shop/review-slice";
 function ProductDetailsDialog({ open, setOpen, productDetails }) {
   const [reviewMsg, setReviewMsg] = useState("");
   const [rating, setRating] = useState(0);
+  const [showImageZoom, setShowImageZoom] = useState(false);
   const dispatch = useDispatch();
   const { user } = useSelector((state) => state.auth);
   const { cartItems } = useSelector((state) => state.shopCart);
@@ -105,38 +106,43 @@ function ProductDetailsDialog({ open, setOpen, productDetails }) {
       : 0;
 
   return (
-    <Dialog open={open} onOpenChange={handleDialogClose}>
-      <DialogContent className="grid grid-cols-2 gap-8 sm:p-12 max-w-[90vw] sm:max-w-[80vw] lg:max-w-[70vw]">
-        <div className="relative overflow-hidden rounded-lg">
-          <img
-            src={productDetails?.image}
-            alt={productDetails?.title}
-            width={600}
-            height={600}
-            className="aspect-square w-full object-cover"
-          />
-        </div>
-        <div className="">
-          <div>
-            <h1 className="text-3xl font-extrabold">{productDetails?.title}</h1>
-            <p className="text-muted-foreground text-2xl mb-5 mt-4">
-              {productDetails?.description}
-            </p>
+    <>
+      <Dialog open={open} onOpenChange={handleDialogClose}>
+        <DialogContent className="p-0 max-w-[95vw] sm:max-w-6xl max-h-[90vh] overflow-auto">
+          <div className="container mx-auto px-4 sm:px-6 py-4 sm:py-6">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6">
+          <div className="relative overflow-hidden rounded-lg bg-white p-2 flex items-center justify-center min-h-80 md:min-h-96">
+            <img
+              src={productDetails?.image}
+              alt={productDetails?.title}
+              className="max-w-full max-h-80 md:max-h-96 object-contain cursor-pointer hover:opacity-90 transition-opacity"
+              onClick={() => setShowImageZoom(true)}
+            />
+            <div className="absolute bottom-2 right-2 bg-black/50 text-white px-2 py-1 rounded text-xs">
+              Click to enlarge
+            </div>
           </div>
-          <div className="flex items-center justify-between">
-            <p
-              className={`text-3xl font-bold text-primary ${
-                productDetails?.salePrice > 0 ? "line-through" : ""
-              }`}
-            >
-              ${productDetails?.price}
-            </p>
-            {productDetails?.salePrice > 0 ? (
-              <p className="text-2xl font-bold text-muted-foreground">
-                ${productDetails?.salePrice}
+          <div className="space-y-4">
+            <div>
+              <h1 className="text-xl sm:text-2xl font-bold">{productDetails?.title}</h1>
+              <p className="text-muted-foreground text-sm sm:text-base mt-2">
+                {productDetails?.description}
               </p>
-            ) : null}
-          </div>
+            </div>
+            <div className="flex items-center justify-between">
+              <p
+                className={`text-xl sm:text-2xl font-bold text-primary ${
+                  productDetails?.salePrice > 0 ? "line-through" : ""
+                }`}
+              >
+                ₱{productDetails?.price}
+              </p>
+              {productDetails?.salePrice > 0 ? (
+                <p className="text-lg sm:text-xl font-bold text-muted-foreground">
+                  ₱{productDetails?.salePrice}
+                </p>
+              ) : null}
+            </div>
           <div className="flex items-center gap-2 mt-2">
             <div className="flex items-center gap-0.5">
               <StarRatingComponent rating={averageReview} />
@@ -145,79 +151,105 @@ function ProductDetailsDialog({ open, setOpen, productDetails }) {
               ({averageReview.toFixed(2)})
             </span>
           </div>
-          <div className="mt-5 mb-5">
-            {productDetails?.totalStock === 0 ? (
-              <Button className="w-full opacity-60 cursor-not-allowed">
-                Out of Stock
-              </Button>
-            ) : (
-              <Button
-                className="w-full"
-                onClick={() =>
-                  handleAddToCart(
-                    productDetails?._id,
-                    productDetails?.totalStock
-                  )
-                }
-              >
-                Add to Cart
-              </Button>
-            )}
-          </div>
-          <Separator />
-          <div className="max-h-[300px] overflow-auto">
-            <h2 className="text-xl font-bold mb-4">Reviews</h2>
-            <div className="grid gap-6">
-              {reviews && reviews.length > 0 ? (
-                reviews.map((reviewItem) => (
-                  <div className="flex gap-4">
-                    <Avatar className="w-10 h-10 border">
-                      <AvatarFallback>
-                        {reviewItem?.userName[0].toUpperCase()}
-                      </AvatarFallback>
-                    </Avatar>
-                    <div className="grid gap-1">
-                      <div className="flex items-center gap-2">
-                        <h3 className="font-bold">{reviewItem?.userName}</h3>
-                      </div>
-                      <div className="flex items-center gap-0.5">
-                        <StarRatingComponent rating={reviewItem?.reviewValue} />
-                      </div>
-                      <p className="text-muted-foreground">
-                        {reviewItem.reviewMessage}
-                      </p>
-                    </div>
-                  </div>
-                ))
+            <div className="mt-4">
+              {productDetails?.totalStock === 0 ? (
+                <Button className="w-full opacity-60 cursor-not-allowed">
+                  Out of Stock
+                </Button>
               ) : (
-                <h1>No Reviews</h1>
+                <Button
+                  className="w-full"
+                  onClick={() =>
+                    handleAddToCart(
+                      productDetails?._id,
+                      productDetails?.totalStock
+                    )
+                  }
+                >
+                  Add to Cart
+                </Button>
               )}
             </div>
-            <div className="mt-10 flex-col flex gap-2">
-              <Label>Write a review</Label>
-              <div className="flex gap-1">
-                <StarRatingComponent
-                  rating={rating}
-                  handleRatingChange={handleRatingChange}
-                />
+            <Separator className="my-4" />
+            <div className="max-h-60 overflow-auto">
+              <h2 className="text-lg font-bold mb-3">Reviews</h2>
+              <div className="grid gap-4">
+                {reviews && reviews.length > 0 ? (
+                  reviews.map((reviewItem) => (
+                    <div key={reviewItem._id} className="flex gap-3">
+                      <Avatar className="w-8 h-8 border">
+                        <AvatarFallback>
+                          {reviewItem?.userName[0].toUpperCase()}
+                        </AvatarFallback>
+                      </Avatar>
+                      <div className="grid gap-1 flex-1">
+                        <div className="flex items-center gap-2">
+                          <h3 className="font-semibold text-sm">{reviewItem?.userName}</h3>
+                        </div>
+                        <div className="flex items-center gap-0.5">
+                          <StarRatingComponent rating={reviewItem?.reviewValue} />
+                        </div>
+                        <p className="text-muted-foreground text-sm">
+                          {reviewItem.reviewMessage}
+                        </p>
+                      </div>
+                    </div>
+                  ))
+                ) : (
+                  <p className="text-muted-foreground">No Reviews</p>
+                )}
               </div>
-              <Input
-                name="reviewMsg"
-                value={reviewMsg}
-                onChange={(event) => setReviewMsg(event.target.value)}
-                placeholder="Write a review..."
-              />
-              <Button
-                onClick={handleAddReview}
-                disabled={reviewMsg.trim() === ""}
-              >
-                Submit
-              </Button>
+              <div className="mt-6 flex-col flex gap-2">
+                <Label className="text-sm">Write a review</Label>
+                <div className="flex gap-1">
+                  <StarRatingComponent
+                    rating={rating}
+                    handleRatingChange={handleRatingChange}
+                  />
+                </div>
+                <Input
+                  name="reviewMsg"
+                  value={reviewMsg}
+                  onChange={(event) => setReviewMsg(event.target.value)}
+                  placeholder="Write a review..."
+                  className="text-sm"
+                />
+                <Button
+                  onClick={handleAddReview}
+                  disabled={reviewMsg.trim() === ""}
+                  size="sm"
+                >
+                  Submit
+                </Button>
+              </div>
             </div>
           </div>
-        </div>
-      </DialogContent>
-    </Dialog>
+            </div>
+          </div>
+        </DialogContent>
+      </Dialog>
+
+      {/* Image Zoom Dialog */}
+      <Dialog open={showImageZoom} onOpenChange={setShowImageZoom}>
+        <DialogContent className="max-w-6xl max-h-[90vh] p-0">
+          <div className="container mx-auto px-2 py-2">
+            <div className="relative">
+            <img
+              src={productDetails?.image}
+              alt={productDetails?.title}
+              className="w-full h-auto max-h-[80vh] object-contain"
+            />
+            <button
+              onClick={() => setShowImageZoom(false)}
+              className="absolute top-2 right-2 bg-black/50 text-white rounded-full w-8 h-8 flex items-center justify-center hover:bg-black/70 transition-colors"
+            >
+              ✕
+            </button>
+          </div>
+          </div>
+        </DialogContent>
+      </Dialog>
+    </>
   );
 }
 
