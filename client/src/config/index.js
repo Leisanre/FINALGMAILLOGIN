@@ -140,11 +140,6 @@ export const shoppingViewHeaderMenuItems = [
     label: "Store",
     path: "/shop/store",
   },
-  {
-    id: "search",
-    label: "Search",
-    path: "/shop/search",
-  },
 ];
 
 export const categoryOptionsMap = {

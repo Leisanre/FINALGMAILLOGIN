@@ -7,7 +7,6 @@ import {
   Mail,
   Phone,
   MapPin,
-  HousePlug,
   Heart,
   Star,
   Award,
@@ -81,16 +80,15 @@ function ShoppingFooter() {
           {/* Company Info */}
           <div className="space-y-6">
             <div className="flex items-center gap-3">
-              <div className="p-2 bg-gradient-to-br from-blue-500 to-purple-600 rounded-lg">
-                <HousePlug className="h-6 w-6 text-white" />
-              </div>
-              <span className="font-bold text-xl bg-gradient-to-r from-blue-400 to-purple-400 bg-clip-text text-transparent">
-                Ecommerce
-              </span>
+              <img
+                src="/src/assets/logoLight.png"
+                alt="BookSale"
+                className="h-10 w-auto"
+              />
             </div>
             <p className="text-gray-300 text-sm leading-relaxed">
-              Your trusted online shopping destination. We bring you quality products
-              with exceptional service and fast delivery worldwide.
+              Your trusted bookstore destination. We bring you quality books, expert recommendations,
+              and exceptional service to book lovers across the Philippines.
             </p>
             
             {/* Contact Info with Icons */}
@@ -99,19 +97,19 @@ function ShoppingFooter() {
                 <div className="p-1.5 bg-blue-500/20 rounded-lg group-hover:bg-blue-500/30 transition-colors">
                   <Mail className="h-4 w-4" />
                 </div>
-                <span>support@ecommerce.com</span>
+                <span>info@booksale.com</span>
               </div>
               <div className="flex items-center gap-3 text-sm text-gray-300 hover:text-green-400 transition-colors group">
                 <div className="p-1.5 bg-green-500/20 rounded-lg group-hover:bg-green-500/30 transition-colors">
                   <Phone className="h-4 w-4" />
                 </div>
-                <span>+1 (555) 123-4567</span>
+                <span>+63 (2) 8123-4567</span>
               </div>
               <div className="flex items-center gap-3 text-sm text-gray-300 hover:text-red-400 transition-colors group">
                 <div className="p-1.5 bg-red-500/20 rounded-lg group-hover:bg-red-500/30 transition-colors">
                   <MapPin className="h-4 w-4" />
                 </div>
-                <span>123 Commerce St, City, State 12345</span>
+                <span>456 Book Avenue, Manila, Philippines</span>
               </div>
             </div>
 
@@ -222,9 +220,9 @@ function ShoppingFooter() {
         <div className="flex flex-col md:flex-row justify-between items-center gap-4">
           {/* Copyright with Heart */}
           <div className="flex items-center gap-2 text-gray-400 text-sm">
-            <span>© {currentYear} Ecommerce. Made with</span>
+            <span>© {currentYear} BookSale. Made with</span>
             <Heart className="w-4 h-4 text-red-400 fill-red-400 animate-pulse" />
-            <span>for amazing customers</span>
+            <span>for book lovers</span>
           </div>
           
           {/* Quick Links with Hover Effects */}
