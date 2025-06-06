@@ -18,8 +18,8 @@ function AdminProductTile({
 }) {
   const [showImageDialog, setShowImageDialog] = useState(false);
   return (
-    <Card className="w-full max-w-sm mx-auto">
-      <div>
+    <Card className="w-full max-w-sm mx-auto h-full flex flex-col">
+      <div className="flex-1 flex flex-col">
         <div className="relative">
           <img
             src={product?.image}
@@ -43,7 +43,7 @@ function AdminProductTile({
             </Badge>
           ) : null}
         </div>
-        <CardContent className="p-4">
+        <CardContent className="p-4 flex-1 flex flex-col">
           <h2 className="text-lg font-bold mb-2 line-clamp-2">{product?.title}</h2>
           
           {/* Description */}
@@ -87,7 +87,7 @@ function AdminProductTile({
           </div>
           
           {/* Price Information */}
-          <div className="flex justify-between items-center">
+          <div className="flex justify-between items-center mt-auto">
             <span
               className={`${
                 product?.salePrice > 0 ? "line-through text-gray-500" : "text-primary"
@@ -100,7 +100,7 @@ function AdminProductTile({
             ) : null}
           </div>
         </CardContent>
-        <CardFooter className="flex justify-between items-center gap-2 p-4 pt-0">
+        <CardFooter className="flex justify-between items-center gap-2 p-4 pt-0 mt-auto">
           <Button
             variant="outline"
             size="sm"

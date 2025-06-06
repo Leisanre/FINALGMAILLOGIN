@@ -171,12 +171,14 @@
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(min(100%, 240px), 1fr));
     gap: 0.75rem;
+    align-items: stretch;
   }
   
   @media (min-width: 640px) {
     .product-tile-grid {
       grid-template-columns: repeat(auto-fill, minmax(min(100%, 220px), 1fr));
       gap: 1rem;
+      align-items: stretch;
     }
   }
   
@@ -184,6 +186,7 @@
     .product-tile-grid {
       grid-template-columns: repeat(auto-fill, minmax(min(100%, 200px), 1fr));
       gap: 1.25rem;
+      align-items: stretch;
     }
   }
   
@@ -191,6 +194,7 @@
     .product-tile-grid {
       grid-template-columns: repeat(auto-fill, minmax(min(100%, 220px), 1fr));
       gap: 1.5rem;
+      align-items: stretch;
     }
   }
   

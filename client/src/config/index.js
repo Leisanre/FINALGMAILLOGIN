@@ -159,6 +159,15 @@ export const brandOptionsMap = {
   "h&m": "H&M",
 };
 
+export const genreOptionsMap = {
+  fiction: "Fiction",
+  "non-fiction": "Non-Fiction",
+  romance: "Romance",
+  mystery: "Mystery",
+  "sci-fi": "Sci-Fi",
+  fantasy: "Fantasy",
+};
+
 export const filterOptions = {
   category: [
     { id: "men", label: "Romance" },

@@ -2,6 +2,13 @@ import { Fragment, useEffect, useState } from "react";
 import { Label } from "../ui/label";
 import { Checkbox } from "../ui/checkbox";
 import { Separator } from "../ui/separator";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuTrigger,
+} from "../ui/dropdown-menu";
+import { Button } from "../ui/button";
+import { ChevronDown } from "lucide-react";
 import axios from "axios";
 
 function ProductFilter({ filters, handleFilter }) {
@@ -42,6 +49,26 @@ function ProductFilter({ filters, handleFilter }) {
     fetchFilterOptions();
   }, []);
 
+  const getSelectedCount = (keyItem) => {
+    const filterValues = filters?.[keyItem];
+    return filterValues ? filterValues.length : 0;
+  };
+
+  const getDisplayText = (keyItem) => {
+    const count = getSelectedCount(keyItem);
+    const categoryName = keyItem === 'brand' ? 'Type' : keyItem;
+    
+    if (count === 0) {
+      return `All ${categoryName}s`;
+    } else if (count === 1) {
+      const selectedId = filters[keyItem][0];
+      const selectedOption = dynamicFilters[keyItem].find(option => option.id === selectedId);
+      return selectedOption ? selectedOption.label : `${count} selected`;
+    } else {
+      return `${count} selected`;
+    }
+  };
+
   return (
     <div className="bg-background rounded-lg shadow-sm">
       <div className="p-4 border-b">
@@ -51,25 +78,40 @@ function ProductFilter({ filters, handleFilter }) {
         {Object.keys(dynamicFilters).map((keyItem) => (
           <Fragment key={keyItem}>
             <div>
-              <h3 className="text-base font-bold capitalize">{keyItem === 'brand' ? 'Type' : keyItem}</h3>
-              <div className="grid gap-2 mt-2">
-                {dynamicFilters[keyItem].map((option) => (
-                  <Label
-                    key={option.id}
-                    className="flex font-medium items-center gap-2"
+              <Label className="text-base font-bold capitalize mb-2 block">
+                {keyItem === 'brand' ? 'Type' : keyItem}
+              </Label>
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button
+                    variant="outline"
+                    className="w-full justify-between"
                   >
-                    <Checkbox
-                      checked={
-                        filters?.[keyItem]?.includes(option.id) || false
-                      }
-                      onCheckedChange={() =>
-                        handleFilter(keyItem, option.id)
-                      }
-                    />
-                    {option.label}
-                  </Label>
-                ))}
-              </div>
+                    <span className="truncate">{getDisplayText(keyItem)}</span>
+                    <ChevronDown className="h-4 w-4 opacity-50" />
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent className="w-full min-w-[200px] p-2">
+                  <div className="space-y-2">
+                    {dynamicFilters[keyItem].map((option) => (
+                      <Label
+                        key={option.id}
+                        className="flex font-medium items-center gap-2 cursor-pointer hover:bg-accent hover:text-accent-foreground rounded-sm p-2"
+                      >
+                        <Checkbox
+                          checked={
+                            filters?.[keyItem]?.includes(option.id) || false
+                          }
+                          onCheckedChange={() =>
+                            handleFilter(keyItem, option.id)
+                          }
+                        />
+                        <span className="flex-1">{option.label}</span>
+                      </Label>
+                    ))}
+                  </div>
+                </DropdownMenuContent>
+              </DropdownMenu>
             </div>
             <Separator />
           </Fragment>

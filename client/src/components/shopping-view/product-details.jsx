@@ -4,6 +4,7 @@ import { Button } from "../ui/button";
 import { Dialog, DialogContent } from "../ui/dialog";
 import { Separator } from "../ui/separator";
 import { Input } from "../ui/input";
+import { Badge } from "../ui/badge";
 import { useDispatch, useSelector } from "react-redux";
 import { addToCart, fetchCartItems } from "@/store/shop/cart-slice";
 import { useToast } from "../ui/use-toast";
@@ -12,17 +13,64 @@ import { Label } from "../ui/label";
 import StarRatingComponent from "../common/star-rating";
 import { useEffect, useState } from "react";
 import { addReview, getReviews } from "@/store/shop/review-slice";
+import { brandOptionsMap, categoryOptionsMap, genreOptionsMap } from "@/config";
 
 function ProductDetailsDialog({ open, setOpen, productDetails }) {
   const [reviewMsg, setReviewMsg] = useState("");
   const [rating, setRating] = useState(0);
   const [showImageZoom, setShowImageZoom] = useState(false);
+  const [dynamicFilters, setDynamicFilters] = useState({});
   const dispatch = useDispatch();
   const { user } = useSelector((state) => state.auth);
   const { cartItems } = useSelector((state) => state.shopCart);
   const { reviews } = useSelector((state) => state.shopReview);
 
   const { toast } = useToast();
+
+  // Fetch dynamic filter data to get proper names
+  useEffect(() => {
+    const fetchFilterOptions = async () => {
+      try {
+        const [brandRes, categoryRes, genreRes] = await Promise.all([
+          fetch("/api/brands").then(res => res.json()),
+          fetch("/api/categories").then(res => res.json()),
+          fetch("/api/genres").then(res => res.json()),
+        ]);
+
+        setDynamicFilters({
+          brand: brandRes.data || [],
+          category: categoryRes.data || [],
+          genre: genreRes.data || [],
+        });
+      } catch (err) {
+        console.error("Error fetching filter options:", err);
+        // Fallback to static maps if API fails
+        setDynamicFilters({});
+      }
+    };
+
+    fetchFilterOptions();
+  }, []);
+
+  // Helper function to get display name
+  const getDisplayName = (type, id) => {
+    if (dynamicFilters[type]?.length > 0) {
+      const item = dynamicFilters[type].find(item => item._id === id);
+      return item ? item.name : null;
+    }
+    
+    // Fallback to static maps
+    switch (type) {
+      case 'brand':
+        return brandOptionsMap[id] || id;
+      case 'category':
+        return categoryOptionsMap[id] || id;
+      case 'genre':
+        return genreOptionsMap[id] || id;
+      default:
+        return id;
+    }
+  };
 
   function handleRatingChange(getRating) {
     console.log(getRating, "getRating");
@@ -128,6 +176,28 @@ function ProductDetailsDialog({ open, setOpen, productDetails }) {
               <p className="text-muted-foreground text-sm sm:text-base mt-2">
                 {productDetails?.description}
               </p>
+              
+              {/* Category, Type, and Genre badges */}
+              <div className="flex flex-wrap gap-2 mt-3">
+                {productDetails?.category && (
+                  <Badge variant="secondary" className="text-xs">
+                    <span className="font-medium">Category:</span>&nbsp;
+                    {getDisplayName('category', productDetails.category)}
+                  </Badge>
+                )}
+                {productDetails?.brand && (
+                  <Badge variant="outline" className="text-xs">
+                    <span className="font-medium">Type:</span>&nbsp;
+                    {getDisplayName('brand', productDetails.brand)}
+                  </Badge>
+                )}
+                {productDetails?.genre && (
+                  <Badge variant="default" className="text-xs">
+                    <span className="font-medium">Genre:</span>&nbsp;
+                    {getDisplayName('genre', productDetails.genre)}
+                  </Badge>
+                )}
+              </div>
             </div>
             <div className="flex items-center justify-between">
               <p
