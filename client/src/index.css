@@ -133,6 +133,55 @@
   overflow-x: auto;
 }
 
+/* Text utilities for responsive design */
+@layer utilities {
+  .line-clamp-2 {
+    overflow: hidden;
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 2;
+    line-height: 1.4;
+  }
+  
+  .line-clamp-1 {
+    overflow: hidden;
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 1;
+    line-height: 1.4;
+  }
+}
+
+/* Enhanced responsive grid behavior */
+@layer utilities {
+  .responsive-grid-auto-fit {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 250px), 1fr));
+    gap: 1rem;
+  }
+  
+  .responsive-grid-auto-fill {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(min(100%, 200px), 1fr));
+    gap: 1rem;
+  }
+}
+
+/* Container responsive behavior */
+@media (max-width: 400px) {
+  .container {
+    padding-left: 0.75rem;
+    padding-right: 0.75rem;
+  }
+}
+
+@media (min-width: 400px) and (max-width: 639px) {
+  .container {
+    padding-left: 1rem;
+    padding-right: 1rem;
+  }
+}
+
 /* Ensure content doesn't break below minimum viewport */
 @media (max-width: 399px) {
   body {
