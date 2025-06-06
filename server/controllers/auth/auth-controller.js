@@ -2,6 +2,7 @@ const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 const User = require("../../models/User");
 const { OAuth2Client } = require("google-auth-library");
+const { cleanupUserData } = require("../../helpers/database-utils");
 
 const GOOGLE_CLIENT_ID = "231430169210-fgm3ltoieaknm6l0klnt9oi2bh9aovcd.apps.googleusercontent.com";
 const JWT_SECRET = "BOOKSYNC";
@@ -23,18 +24,58 @@ const googleLogin = async (req, res) => {
       return res.status(400).json({ success: false, message: "Email not verified by Google" });
     }
 
-    let user = await User.findOne({ email: payload.email });
+    // Clean up any orphaned data first
+    let user = await cleanupUserData(payload.email);
+    let isNewUser = false;
 
     if (!user) {
-      user = new User({
-        userName: payload.name,
-        email: payload.email,
-        password: null,
-        authType: "google",
-        avatar: payload.picture,
-      });
+      // Check if userName already exists and create a unique one if needed
+      let uniqueUserName = payload.name;
+      let userNameExists = await User.findOne({ userName: uniqueUserName });
+      let counter = 1;
+      
+      while (userNameExists) {
+        uniqueUserName = `${payload.name}_${counter}`;
+        userNameExists = await User.findOne({ userName: uniqueUserName });
+        counter++;
+      }
 
-      await user.save();
+      // Create new user when signing in with Google for the first time
+      try {
+        user = new User({
+          userName: uniqueUserName,
+          email: payload.email,
+          password: null,
+          authType: "google",
+          avatar: payload.picture,
+        });
+
+        await user.save();
+        isNewUser = true;
+      } catch (duplicateError) {
+        // Handle potential duplicate key errors
+        if (duplicateError.code === 11000) {
+          // If it's a duplicate email error, try to find the existing user again
+          if (duplicateError.keyPattern?.email) {
+            user = await User.findOne({ email: payload.email });
+            if (user) {
+              isNewUser = false;
+            } else {
+              return res.status(400).json({
+                success: false,
+                message: "Account creation failed. Please try again."
+              });
+            }
+          } else {
+            return res.status(400).json({
+              success: false,
+              message: "Username already exists. Please try again."
+            });
+          }
+        } else {
+          throw duplicateError;
+        }
+      }
     }
 
     const token = jwt.sign(
@@ -54,7 +95,7 @@ const googleLogin = async (req, res) => {
       sameSite: "lax",
     }).json({
       success: true,
-      message: "Logged in with Google",
+      message: isNewUser ? "Account created and logged in successfully with Google" : "Logged in with Google",
       user: {
         email: user.email,
         role: user.role,

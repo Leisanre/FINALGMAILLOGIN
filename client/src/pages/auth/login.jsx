@@ -119,6 +119,8 @@ function AuthLogin() {
               onError={() => {
                 toast({ title: "Google Sign-In failed", variant: "destructive" });
               }}
+              auto_select={false}
+              cancel_on_tap_outside={true}
             />
           </div>
         </div>

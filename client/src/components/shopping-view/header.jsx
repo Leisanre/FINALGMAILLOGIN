@@ -1,4 +1,4 @@
-import { HousePlug, LogOut, Menu, ShoppingCart, UserCog } from "lucide-react";
+import { LogOut, Menu, ShoppingCart, UserCog, Search } from "lucide-react";
 import {
   Link,
   useLocation,
@@ -7,6 +7,7 @@ import {
 } from "react-router-dom";
 import { Sheet, SheetContent, SheetTrigger } from "../ui/sheet";
 import { Button } from "../ui/button";
+import { Input } from "../ui/input";
 import { useDispatch, useSelector } from "react-redux";
 import { shoppingViewHeaderMenuItems } from "@/config";
 import {
@@ -34,7 +35,6 @@ function MenuItems() {
     const currentFilter =
       getCurrentMenuItem.id !== "home" &&
       getCurrentMenuItem.id !== "products" &&
-      getCurrentMenuItem.id !== "search" &&
       getCurrentMenuItem.id !== "about" &&
       getCurrentMenuItem.id !== "contact" &&
       getCurrentMenuItem.id !== "store"
@@ -53,16 +53,31 @@ function MenuItems() {
   }
 
   return (
-    <nav className="flex flex-col mb-3 lg:mb-0 lg:items-center gap-6 lg:flex-row">
-      {shoppingViewHeaderMenuItems.map((menuItem) => (
-        <Label
-          onClick={() => handleNavigate(menuItem)}
-          className="text-sm font-medium cursor-pointer"
-          key={menuItem.id}
-        >
-          {menuItem.label}
-        </Label>
-      ))}
+    <nav className="flex flex-col mb-3 lg:mb-0 lg:items-center gap-6 lg:flex-row lg:text-left text-right">
+      {shoppingViewHeaderMenuItems.map((menuItem) => {
+        const isActive = location.pathname === menuItem.path ||
+          (menuItem.id === "products" && location.pathname === "/shop/listing");
+        
+        return (
+          <Label
+            onClick={() => handleNavigate(menuItem)}
+            className={`text-sm font-medium cursor-pointer transition-all duration-300 ease-in-out relative group ${
+              isActive
+                ? 'text-[#126c1b] font-semibold'
+                : 'text-gray-700 hover:text-[#126c1b] hover:scale-105'
+            }`}
+            key={menuItem.id}
+          >
+            {menuItem.label}
+            {/* Active indicator underline */}
+            <span
+              className={`absolute -bottom-1 left-0 h-0.5 bg-[#126c1b] transition-all duration-300 ${
+                isActive ? 'w-full' : 'w-0 group-hover:w-full'
+              }`}
+            />
+          </Label>
+        );
+      })}
     </nav>
   );
 }
@@ -85,7 +100,7 @@ function HeaderRightContent() {
   console.log(cartItems, "sangam");
 
   return (
-    <div className="flex lg:items-center lg:flex-row flex-col gap-4">
+    <div className="flex lg:items-center lg:flex-row flex-col gap-4 items-end lg:items-center">
       <Sheet open={openCartSheet} onOpenChange={() => setOpenCartSheet(false)}>
         <Button
           onClick={() => setOpenCartSheet(true)}
@@ -117,7 +132,7 @@ function HeaderRightContent() {
             </AvatarFallback>
           </Avatar>
         </DropdownMenuTrigger>
-        <DropdownMenuContent side="right" className="w-56">
+        <DropdownMenuContent side="bottom" align="end" className="w-56">
           <DropdownMenuLabel>Logged in as {user?.userName}</DropdownMenuLabel>
           <DropdownMenuSeparator />
           <DropdownMenuItem onClick={() => navigate("/shop/account")}>
@@ -137,35 +152,96 @@ function HeaderRightContent() {
 
 function ShoppingHeader() {
   const { isAuthenticated } = useSelector((state) => state.auth);
+  const location = useLocation();
+  const navigate = useNavigate();
+  const [searchTerm, setSearchTerm] = useState("");
+
+  // Check if current page is Home or Products (listing)
+  const showSearchHeader = location.pathname === "/shop/home" || location.pathname === "/shop/listing";
+
+  const handleSearch = (e) => {
+    e.preventDefault();
+    if (searchTerm.trim()) {
+      // Search functionality can be implemented here if needed
+      console.log("Search term:", searchTerm);
+    }
+  };
 
   return (
-    <header className="sticky top-0 z-40 w-full border-b bg-background">
-      <div className="flex h-16 items-center justify-between px-4 md:px-6">
-        <Link to="/shop/home" className="flex items-center gap-2">
-          <HousePlug className="h-6 w-6" />
-          <span className="font-bold">Ecommerce</span>
-        </Link>
-        <Sheet>
-          <SheetTrigger asChild>
-            <Button variant="outline" size="icon" className="lg:hidden">
-              <Menu className="h-6 w-6" />
-              <span className="sr-only">Toggle header menu</span>
-            </Button>
-          </SheetTrigger>
-          <SheetContent side="left" className="w-full max-w-xs">
-            <MenuItems />
-            <HeaderRightContent />
-          </SheetContent>
-        </Sheet>
-        <div className="hidden lg:block">
-          <MenuItems />
-        </div>
+    <>
+      {/* Main Header */}
+      <header className="sticky top-0 z-40 w-full border-b bg-background">
+        <div className="relative h-16">
+          <div className="container mx-auto h-full flex items-center justify-between">
+            {/* Logo - Left Side */}
+            <div className="flex items-center gap-2">
+              <Link to="/shop/home" className="flex items-center gap-2">
+                <img
+                  src="/src/assets/logoLight.png"
+                  alt="BookSale"
+                  className="h-8 w-auto"
+                />
+              </Link>
+            </div>
 
-        <div className="hidden lg:block">
-          <HeaderRightContent />
+            {/* Right Side - Mobile and Desktop */}
+            <div className="flex items-center">
+              {/* Mobile Menu Button */}
+              <div className="lg:hidden">
+                <Sheet>
+                  <SheetTrigger asChild>
+                    <Button variant="outline" size="icon">
+                      <Menu className="h-6 w-6" />
+                      <span className="sr-only">Toggle header menu</span>
+                    </Button>
+                  </SheetTrigger>
+                  <SheetContent side="right" className="w-full max-w-xs">
+                    <MenuItems />
+                    <HeaderRightContent />
+                  </SheetContent>
+                </Sheet>
+              </div>
+
+              {/* Desktop User Controls */}
+              <div className="hidden lg:block">
+                <HeaderRightContent />
+              </div>
+            </div>
+          </div>
+
+          {/* Absolutely Centered Navigation - Desktop Only */}
+          <div className="hidden lg:block absolute left-1/2 top-1/2 transform -translate-x-1/2 -translate-y-1/2">
+            <MenuItems />
+          </div>
         </div>
-      </div>
-    </header>
+      </header>
+
+      {/* Second Header with Search Bar - Only on Home and Products pages */}
+      {showSearchHeader && (
+        <div className="w-full h-16" style={{ backgroundColor: '#126c1b' }}>
+          <div className="flex h-16 items-center justify-center px-4 md:px-6">
+            <div className="w-full max-w-2xl">
+              <form onSubmit={handleSearch} className="relative">
+                <Input
+                  type="text"
+                  placeholder="Search for books, authors, genres..."
+                  value={searchTerm}
+                  onChange={(e) => setSearchTerm(e.target.value)}
+                  className="w-full pl-4 pr-12 py-2 text-gray-900 bg-white border-0 rounded-md focus:ring-2 focus:ring-white/50"
+                />
+                <Button
+                  type="submit"
+                  size="sm"
+                  className="absolute right-1 top-1/2 transform -translate-y-1/2 bg-transparent hover:bg-gray-100/20 text-gray-600 hover:text-gray-800"
+                >
+                  <Search className="h-4 w-4" />
+                </Button>
+              </form>
+            </div>
+          </div>
+        </div>
+      )}
+    </>
   );
 }
 

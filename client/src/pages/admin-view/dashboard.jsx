@@ -71,14 +71,14 @@ export default function AdminDashboard() {
     // Count active products
     const activeItems = productList?.length || 0;
     
-    // Get customer visits (should be tracked on customer-facing pages, not admin)
-    const customerVisits = parseInt(localStorage.getItem('customerVisits') || '0');
+    // Get user visits (tracked per login)
+    const userVisits = parseInt(localStorage.getItem('userVisits') || '0');
     
     return {
       totalSales,
       totalBookOrders,
       activeItems,
-      visits: customerVisits,
+      visits: userVisits,
     };
   };
 
@@ -294,17 +294,17 @@ export default function AdminDashboard() {
     setImageToDelete(null);
   };
 
+
   useEffect(() => {
     // Fetch all necessary data on component mount
     dispatch(getFeatureImages());
     dispatch(getAllOrdersForAdmin());
     dispatch(fetchAllProducts());
     
-    // Initialize customer visits counter (read-only for admin)
-    // This should be incremented on customer-facing pages only
-    const customerVisits = localStorage.getItem('customerVisits');
-    if (!customerVisits) {
-      localStorage.setItem('customerVisits', '0');
+    // Initialize user visits counter if it doesn't exist
+    const userVisits = localStorage.getItem('userVisits');
+    if (!userVisits) {
+      localStorage.setItem('userVisits', '0');
     }
   }, [dispatch]);
 
@@ -606,6 +606,7 @@ export default function AdminDashboard() {
           </DialogFooter>
         </DialogContent>
       </Dialog>
+
     </div>
   );
 }

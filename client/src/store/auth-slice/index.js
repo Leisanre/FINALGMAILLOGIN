@@ -116,6 +116,16 @@ const authSlice = createSlice({
         state.isLoading = false;
         state.user = action.payload.success ? action.payload.user : null;
         state.isAuthenticated = action.payload.success;
+        
+        // Increment visit counter on successful login (only for regular users, not admins)
+        if (action.payload.success && action.payload.user && action.payload.user.role !== 'admin') {
+          const currentVisits = parseInt(localStorage.getItem('userVisits') || '0');
+          localStorage.setItem('userVisits', (currentVisits + 1).toString());
+          
+          // Set session marker for this login
+          const sessionKey = `session_${action.payload.user.id}_${Date.now()}`;
+          sessionStorage.setItem('currentUserSession', sessionKey);
+        }
       })
       .addCase(loginUser.rejected, (state) => {
         state.isLoading = false;
@@ -131,6 +141,16 @@ const authSlice = createSlice({
         state.isLoading = false;
         state.user = action.payload.success ? action.payload.user : null;
         state.isAuthenticated = action.payload.success;
+        
+        // Increment visit counter on successful Google login (only for regular users, not admins)
+        if (action.payload.success && action.payload.user && action.payload.user.role !== 'admin') {
+          const currentVisits = parseInt(localStorage.getItem('userVisits') || '0');
+          localStorage.setItem('userVisits', (currentVisits + 1).toString());
+          
+          // Set session marker for this login
+          const sessionKey = `session_${action.payload.user.id}_${Date.now()}`;
+          sessionStorage.setItem('currentUserSession', sessionKey);
+        }
       })
       .addCase(googleLoginUser.rejected, (state) => {
         state.isLoading = false;
@@ -146,6 +166,19 @@ const authSlice = createSlice({
         state.isLoading = false;
         state.user = action.payload.success ? action.payload.user : null;
         state.isAuthenticated = action.payload.success;
+        
+        // Increment visit counter only once per session when user is authenticated (only for regular users, not admins)
+        if (action.payload.success && action.payload.user && action.payload.user.role !== 'admin') {
+          const sessionKey = `session_${action.payload.user.id}_${Date.now()}`;
+          const lastSession = sessionStorage.getItem('currentUserSession');
+          
+          // Only count if this is a new session (different from last recorded session)
+          if (!lastSession || lastSession !== sessionKey) {
+            const currentVisits = parseInt(localStorage.getItem('userVisits') || '0');
+            localStorage.setItem('userVisits', (currentVisits + 1).toString());
+            sessionStorage.setItem('currentUserSession', sessionKey);
+          }
+        }
       })
       .addCase(checkAuth.rejected, (state) => {
         state.isLoading = false;
