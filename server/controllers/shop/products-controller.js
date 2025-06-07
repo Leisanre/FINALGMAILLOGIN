@@ -29,6 +29,7 @@ const addProduct = async (req, res) => {
       description,
       category,
       brand,
+      genre,
       price,
       salePrice,
       totalStock,
@@ -41,6 +42,7 @@ const addProduct = async (req, res) => {
       description,
       category,
       brand,
+      genre,
       price,
       salePrice,
       totalStock,
@@ -89,6 +91,7 @@ const editProduct = async (req, res) => {
       description,
       category,
       brand,
+      genre,
       price,
       salePrice,
       totalStock,
@@ -108,6 +111,7 @@ const editProduct = async (req, res) => {
     findProduct.description = description || findProduct.description;
     findProduct.category = category || findProduct.category;
     findProduct.brand = brand || findProduct.brand;
+    findProduct.genre = genre || findProduct.genre;
     findProduct.price = price === "" ? 0 : price || findProduct.price;
     findProduct.salePrice = salePrice === "" ? 0 : salePrice || findProduct.salePrice;
     findProduct.totalStock = totalStock || findProduct.totalStock;
@@ -158,17 +162,29 @@ const deleteProduct = async (req, res) => {
 // Get filtered products
 const getFilteredProducts = async (req, res) => {
   try {
-    const { category = "", brand = "", sortBy = "price-lowtohigh" } = req.query;
+    const { category = "", brand = "", genre = "", sortBy = "price-lowtohigh" } = req.query;
+
+    console.log("Received filter params:", { category, brand, genre, sortBy });
 
     const filters = {};
 
+    // Build filters - handle both string names and ObjectIds
     if (category.length) {
-      filters.category = { $in: category.split(",") };
+      const categoryValues = category.split(",");
+      filters.category = { $in: categoryValues };
     }
 
     if (brand.length) {
-      filters.brand = { $in: brand.split(",") };
+      const brandValues = brand.split(",");
+      filters.brand = { $in: brandValues };
     }
+
+    if (genre.length) {
+      const genreValues = genre.split(",");
+      filters.genre = { $in: genreValues };
+    }
+
+    console.log("MongoDB filters:", filters);
 
     const sort = {};
 
@@ -190,14 +206,42 @@ const getFilteredProducts = async (req, res) => {
         break;
     }
 
+    console.log("Sort criteria:", sort);
+
     const products = await Product.find(filters).sort(sort);
+
+    console.log("Found products:", products.length);
+    if (products.length > 0) {
+      console.log("Sample product fields:", {
+        title: products[0].title,
+        category: products[0].category,
+        brand: products[0].brand,
+        genre: products[0].genre
+      });
+    } else {
+      console.log("No products found with filters:", filters);
+      
+      // Debug: Let's also check total products without filters
+      const totalProducts = await Product.countDocuments({});
+      console.log("Total products in database:", totalProducts);
+      
+      if (totalProducts > 0) {
+        const sampleProduct = await Product.findOne({});
+        console.log("Sample product from DB:", {
+          title: sampleProduct?.title,
+          category: sampleProduct?.category,
+          brand: sampleProduct?.brand,
+          genre: sampleProduct?.genre
+        });
+      }
+    }
 
     res.status(200).json({
       success: true,
       data: products,
     });
   } catch (error) {
-    console.error(error);
+    console.error("Error in getFilteredProducts:", error);
     res.status(500).json({
       success: false,
       message: "Some error occurred",
