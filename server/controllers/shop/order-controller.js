@@ -20,6 +20,46 @@ const createOrder = async (req, res) => {
       cartId,
     } = req.body;
 
+    // Handle Cash on Delivery orders
+    if (paymentMethod === "cod") {
+      const newlyCreatedOrder = new Order({
+        userId,
+        cartId,
+        cartItems,
+        addressInfo,
+        orderStatus,
+        paymentMethod,
+        paymentStatus,
+        totalAmount,
+        orderDate,
+        orderUpdateDate,
+        paymentId: "",
+        payerId: "",
+      });
+
+      await newlyCreatedOrder.save();
+
+      // Update product stock for COD orders
+      for (let item of cartItems) {
+        let product = await Product.findById(item.productId);
+        if (product) {
+          product.totalStock -= item.quantity;
+          await product.save();
+        }
+      }
+
+      // Clear the cart
+      await Cart.findByIdAndDelete(cartId);
+
+      res.status(201).json({
+        success: true,
+        message: "Cash on Delivery order created successfully",
+        orderId: newlyCreatedOrder._id,
+      });
+      return;
+    }
+
+    // Handle PayPal orders (existing logic)
     const create_payment_json = {
       intent: "sale",
       payer: {

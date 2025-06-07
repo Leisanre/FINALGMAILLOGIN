@@ -65,18 +65,18 @@ function ShoppingAbout() {
   return (
     <div className="flex flex-col min-h-screen">
       {/* Hero Section */}
-      <section className="py-12 md:py-20 bg-gradient-to-br from-blue-50 to-indigo-100">
+      <section className="py-12 md:py-20" style={{backgroundColor: '#126c1b'}}>
         <div className="container mx-auto px-4">
           <div className="text-center max-w-4xl mx-auto">
-            <h1 className="text-3xl md:text-5xl font-bold text-gray-900 mb-6">
+            <h1 className="text-3xl md:text-5xl font-bold text-white mb-6">
               About Our Store
             </h1>
-            <p className="text-lg md:text-xl text-gray-600 mb-8 leading-relaxed">
-              We're passionate about bringing you the best shopping experience with carefully selected products, 
+            <p className="text-lg md:text-xl text-white mb-8 leading-relaxed">
+              We're passionate about bringing you the best shopping experience with carefully selected products,
               exceptional customer service, and innovative solutions that make your life better.
             </p>
             <Badge variant="secondary" className="text-sm px-4 py-2">
-              Established 2020
+              Established 1980
             </Badge>
           </div>
         </div>
@@ -104,25 +104,25 @@ function ShoppingAbout() {
       </section>
 
       {/* Our Story Section */}
-      <section className="py-12 md:py-16 bg-gray-50">
+      <section className="py-12 md:py-16" style={{backgroundColor: '#E8E8E6'}}>
         <div className="container mx-auto px-4">
           <div className="max-w-4xl mx-auto">
-            <h2 className="text-2xl md:text-3xl font-bold text-center mb-8 md:mb-12">
+            <h2 className="text-2xl md:text-3xl font-bold text-center mb-8 md:mb-12 text-gray-800">
               Our Story
             </h2>
-            <div className="prose prose-lg max-w-none text-gray-600 space-y-6">
-              <p className="text-lg leading-relaxed">
+            <div className="prose prose-lg max-w-none text-gray-800 space-y-6">
+              <p className="text-lg leading-relaxed text-gray-800">
                 Founded in 2020, our e-commerce platform began with a simple mission: to make quality products 
                 accessible to everyone, everywhere. What started as a small team of passionate entrepreneurs has 
                 grown into a thriving community of satisfied customers across the globe.
               </p>
-              <p className="text-lg leading-relaxed">
+              <p className="text-lg leading-relaxed text-gray-800">
                 We believe that shopping should be more than just a transaction—it should be an experience. 
                 That's why we've built our platform around the principles of trust, quality, and exceptional 
                 customer service. Every product we offer is carefully selected, and every customer interaction 
                 is an opportunity to exceed expectations.
               </p>
-              <p className="text-lg leading-relaxed">
+              <p className="text-lg leading-relaxed text-gray-800">
                 Today, we're proud to serve thousands of customers worldwide, offering everything from the latest 
                 fashion trends to innovative technology solutions. Our commitment to excellence drives us to 
                 continuously improve and expand our offerings while maintaining the personal touch that sets us apart.
@@ -193,27 +193,6 @@ function ShoppingAbout() {
         </div>
       </section>
 
-      {/* Contact CTA Section */}
-      <section className="py-12 md:py-16 bg-white">
-        <div className="container mx-auto px-4">
-          <div className="text-center max-w-2xl mx-auto">
-            <h2 className="text-2xl md:text-3xl font-bold mb-4">
-              Get In Touch
-            </h2>
-            <p className="text-gray-600 mb-8">
-              Have questions about our products or services? We'd love to hear from you.
-            </p>
-            <div className="flex flex-col sm:flex-row gap-4 justify-center">
-              <Badge variant="outline" className="text-sm px-4 py-2">
-                Email: support@ecommerce.com
-              </Badge>
-              <Badge variant="outline" className="text-sm px-4 py-2">
-                Phone: +1 (555) 123-4567
-              </Badge>
-            </div>
-          </div>
-        </div>
-      </section>
     </div>
   );
 }

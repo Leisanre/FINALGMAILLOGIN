@@ -91,13 +91,13 @@ function ShoppingContact() {
   return (
     <div className="flex flex-col min-h-screen">
       {/* Hero Section */}
-      <section className="py-12 md:py-20 bg-gradient-to-br from-blue-50 to-indigo-100">
+      <section className="py-12 md:py-20" style={{backgroundColor: '#126c1b'}}>
         <div className="container mx-auto px-4">
           <div className="text-center max-w-4xl mx-auto">
-            <h1 className="text-3xl md:text-5xl font-bold text-gray-900 mb-6">
-              Contact BookSale
+            <h1 className="text-3xl md:text-5xl font-bold text-white mb-6">
+              Contact BOOKSALE
             </h1>
-            <p className="text-lg md:text-xl text-gray-600 mb-8 leading-relaxed">
+            <p className="text-lg md:text-xl text-white mb-8 leading-relaxed">
               Have questions about books, need recommendations, or want to inquire about our services?
               Our book experts are here to help you find your next great read!
             </p>
@@ -119,7 +119,7 @@ function ShoppingContact() {
       <section className="py-12 md:py-16 bg-white">
         <div className="container mx-auto px-4">
           <h2 className="text-2xl md:text-3xl font-bold text-center mb-8 md:mb-12">
-            Connect With Our BookSale Team
+            Connect With Our BOOKSALE Team
           </h2>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
             {contactMethods.map((method, index) => (
@@ -139,7 +139,7 @@ function ShoppingContact() {
       </section>
 
       {/* Contact Form and Info */}
-      <section className="py-12 md:py-16 bg-gray-50">
+      <section className="py-12 md:py-16" style={{backgroundColor: '#F5F5F3'}}>
         <div className="container mx-auto px-4">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 md:gap-12">
             {/* Contact Form */}

@@ -24,6 +24,7 @@ import UserCartWrapper from "./cart-wrapper";
 import { useEffect, useState } from "react";
 import { fetchCartItems } from "@/store/shop/cart-slice";
 import { Label } from "../ui/label";
+import SearchBar from "./search-bar";
 
 function MenuItems() {
   const navigate = useNavigate();
@@ -153,19 +154,9 @@ function HeaderRightContent() {
 function ShoppingHeader() {
   const { isAuthenticated } = useSelector((state) => state.auth);
   const location = useLocation();
-  const navigate = useNavigate();
-  const [searchTerm, setSearchTerm] = useState("");
 
   // Check if current page is Home or Products (listing)
   const showSearchHeader = location.pathname === "/shop/home" || location.pathname === "/shop/listing";
-
-  const handleSearch = (e) => {
-    e.preventDefault();
-    if (searchTerm.trim()) {
-      // Search functionality can be implemented here if needed
-      console.log("Search term:", searchTerm);
-    }
-  };
 
   return (
     <>
@@ -220,24 +211,7 @@ function ShoppingHeader() {
       {showSearchHeader && (
         <div className="w-full h-16" style={{ backgroundColor: '#126c1b' }}>
           <div className="flex h-16 items-center justify-center px-4 md:px-6">
-            <div className="w-full max-w-2xl">
-              <form onSubmit={handleSearch} className="relative">
-                <Input
-                  type="text"
-                  placeholder="Search for books, authors, genres..."
-                  value={searchTerm}
-                  onChange={(e) => setSearchTerm(e.target.value)}
-                  className="w-full pl-4 pr-12 py-2 text-gray-900 bg-white border-0 rounded-md focus:ring-2 focus:ring-white/50"
-                />
-                <Button
-                  type="submit"
-                  size="sm"
-                  className="absolute right-1 top-1/2 transform -translate-y-1/2 bg-transparent hover:bg-gray-100/20 text-gray-600 hover:text-gray-800"
-                >
-                  <Search className="h-4 w-4" />
-                </Button>
-              </form>
-            </div>
+            <SearchBar />
           </div>
         </div>
       )}

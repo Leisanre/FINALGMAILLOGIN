@@ -1,51 +1,94 @@
-// Debug script to check product data structure
 const mongoose = require('mongoose');
 
-// Connect to MongoDB (adjust connection string as needed)
-const connectDB = async () => {
+// Product Schema
+const ProductSchema = new mongoose.Schema(
+  {
+    image: String,
+    title: String,
+    description: String,
+    category: String,
+    brand: String,
+    genre: String,
+    price: Number,
+    salePrice: Number,
+    totalStock: Number,
+    averageReview: {
+      type: Number,
+      default: 0,
+    },
+  },
+  { timestamps: true }
+);
+
+const Product = mongoose.model("Product", ProductSchema);
+
+async function debugProducts() {
   try {
-    await mongoose.connect('mongodb://localhost:27017/mern-ecommerce'); // Update with your DB name
-    console.log('Connected to MongoDB');
+    // Connect to MongoDB
+    await mongoose.connect("mongodb+srv://emanuelnicholasnm:emanuelnicholasnm@cluster0.s8pfxat.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0");
+    console.log("MongoDB connected");
     
-    // Get the Product model (adjust path as needed)
-    const Product = require('./server/models/Product');
-    
-    // Fetch a few sample products
-    const products = await Product.find({}).limit(5);
-    
-    console.log('\n=== SAMPLE PRODUCTS ===');
-    products.forEach((product, index) => {
-      console.log(`\nProduct ${index + 1}:`);
-      console.log('Title:', product.title);
-      console.log('Category:', product.category, '(type:', typeof product.category, ')');
-      console.log('Brand:', product.brand, '(type:', typeof product.brand, ')');
-      console.log('Genre:', product.genre, '(type:', typeof product.genre, ')');
+    // Find all products with "Dune" in title
+    console.log('\n1. Searching for products with "Dune" in title...');
+    const duneProducts = await Product.find({ title: /Dune/i });
+    console.log(`Found ${duneProducts.length} products with "Dune" in title:`);
+    duneProducts.forEach(product => {
+      console.log(`- ${product.title} by ${product.brand || 'Unknown'} (${product.genre || 'No genre'})`);
     });
     
-    // Fetch categories, brands, and genres
-    const Category = require('./server/models/Category');
-    const Brand = require('./server/models/Brand');
-    const Genre = require('./server/models/Genre');
+    // Test the exact regex pattern used in autocomplete
+    console.log('\n2. Testing exact regex pattern from autocomplete...');
+    const keyword = "Dune";
+    const regEx = new RegExp(keyword, "i");
     
-    const categories = await Category.find({}).limit(5);
-    const brands = await Brand.find({}).limit(5);
-    const genres = await Genre.find({}).limit(5);
+    const suggestions = await Product.find(
+      {
+        $or: [
+          { title: regEx },
+          { brand: regEx },
+          { genre: regEx },
+          { category: regEx },
+        ],
+      },
+      { title: 1, brand: 1, genre: 1, category: 1, _id: 1 }
+    ).limit(8);
     
-    console.log('\n=== SAMPLE CATEGORIES ===');
-    categories.forEach(cat => console.log('ID:', cat._id.toString(), 'Name:', cat.name));
+    console.log(`Autocomplete query found ${suggestions.length} products:`);
+    suggestions.forEach(product => {
+      console.log(`- ${product.title} by ${product.brand || 'Unknown'} (${product.genre || 'No genre'})`);
+    });
     
-    console.log('\n=== SAMPLE BRANDS ===');
-    brands.forEach(brand => console.log('ID:', brand._id.toString(), 'Name:', brand.name));
+    // Test partial matches
+    console.log('\n3. Testing partial matches...');
+    const partialSuggestions = await Product.find(
+      {
+        $or: [
+          { title: /.*Dune.*/i },
+          { brand: /.*Dune.*/i },
+          { genre: /.*Dune.*/i },
+          { category: /.*Dune.*/i },
+        ],
+      }
+    );
     
-    console.log('\n=== SAMPLE GENRES ===');
-    genres.forEach(genre => console.log('ID:', genre._id.toString(), 'Name:', genre.name));
+    console.log(`Partial match found ${partialSuggestions.length} products:`);
+    partialSuggestions.forEach(product => {
+      console.log(`- ${product.title} by ${product.brand || 'Unknown'} (${product.genre || 'No genre'})`);
+    });
     
-    await mongoose.connection.close();
-    console.log('\nDisconnected from MongoDB');
+    // List a few sample products to see what's in the database
+    console.log('\n4. Sample products in database:');
+    const sampleProducts = await Product.find({}).limit(5);
+    sampleProducts.forEach(product => {
+      console.log(`- ${product.title} by ${product.brand || 'Unknown'} (${product.genre || 'No genre'})`);
+    });
     
   } catch (error) {
     console.error('Error:', error);
+  } finally {
+    await mongoose.disconnect();
+    console.log('\nDisconnected from MongoDB');
   }
-};
+}
 
-connectDB();
+debugProducts();

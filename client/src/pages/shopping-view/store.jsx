@@ -86,7 +86,7 @@ function ShoppingStore() {
   ];
 
   const storeStats = [
-    { icon: StoreIcon, label: "BookSale Stores", value: "4", color: "text-blue-500" },
+    { icon: StoreIcon, label: "BOOKSALE Stores", value: "4", color: "text-blue-500" },
     { icon: Users, label: "Book Lovers Served", value: "50K+", color: "text-green-500" },
     { icon: MapPin, label: "Cities", value: "4", color: "text-purple-500" },
     { icon: ShoppingBag, label: "Books Sold Daily", value: "1,500+", color: "text-orange-500" }
@@ -106,13 +106,13 @@ function ShoppingStore() {
   return (
     <div className="flex flex-col min-h-screen">
       {/* Hero Section */}
-      <section className="py-12 md:py-20 bg-gradient-to-br from-blue-50 to-indigo-100">
+      <section className="py-12 md:py-20" style={{backgroundColor: '#126c1b'}}>
         <div className="container mx-auto px-4">
           <div className="text-center max-w-4xl mx-auto">
-            <h1 className="text-3xl md:text-5xl font-bold text-gray-900 mb-6">
-              BookSale Store Locations
+            <h1 className="text-3xl md:text-5xl font-bold text-white mb-6">
+              BOOKSALE Store Locations
             </h1>
-            <p className="text-lg md:text-xl text-gray-600 mb-8 leading-relaxed">
+            <p className="text-lg md:text-xl text-white mb-8 leading-relaxed">
               Visit our bookstores to browse thousands of books, get personalized recommendations from our
               book experts, and discover your next great read in a cozy reading environment.
             </p>
@@ -152,14 +152,14 @@ function ShoppingStore() {
       </section>
 
       {/* Store Locations */}
-      <section className="py-12 md:py-16 bg-gray-50">
+      <section className="py-12 md:py-16" style={{backgroundColor: '#F2F2F0'}}>
         <div className="container mx-auto px-4">
           <div className="text-center mb-8 md:mb-12">
-            <h2 className="text-2xl md:text-3xl font-bold mb-4">
-              Find a BookSale Store Near You
+            <h2 className="text-2xl md:text-3xl font-bold mb-4 text-gray-800">
+              Find a BOOKSALE Store Near You
             </h2>
-            <p className="text-gray-600 max-w-2xl mx-auto">
-              Each BookSale store offers a carefully curated selection of books, comfortable reading
+            <p className="text-gray-700 max-w-2xl mx-auto">
+              Each BOOKSALE store offers a carefully curated selection of books, comfortable reading
               spaces, and knowledgeable staff ready to help you discover your next favorite book.
             </p>
           </div>
