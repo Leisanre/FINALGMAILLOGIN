@@ -176,7 +176,7 @@ function AdminOrdersView() {
                           </Badge>
                         </TableCell>
                         <TableCell className="text-xs sm:text-sm lg:text-base font-semibold">
-                          ${orderItem?.totalAmount}
+                          ₱{orderItem?.totalAmount}
                         </TableCell>
                         <TableCell>
                           <Button
@@ -249,7 +249,7 @@ function AdminOrdersView() {
                             : "Pending"}
                         </Badge>
                         <p className="text-lg font-bold text-primary">
-                          ${orderItem?.totalAmount}
+                          ₱{orderItem?.totalAmount}
                         </p>
                       </div>
 

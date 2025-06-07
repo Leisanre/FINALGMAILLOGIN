@@ -189,7 +189,7 @@ export default function AdminDashboard() {
     labels: chartData.months,
     datasets: [
       {
-        label: "Revenue ($)",
+        label: "Revenue (₱)",
         data: chartData.monthlyRevenue,
         fill: false,
         tension: 0.3,
@@ -312,7 +312,7 @@ export default function AdminDashboard() {
     <div className="grid grid-cols-1 gap-4 sm:gap-6 p-3 sm:p-4 md:p-6 min-layout-protection">
       {/* Summary Cards - Same pattern as product page */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4 lg:gap-6">
-        <SummaryCard title="Total Sales" value={`$${summaryStats.totalSales.toLocaleString()}`} />
+        <SummaryCard title="Total Sales" value={`₱${summaryStats.totalSales.toLocaleString()}`} />
         <SummaryCard title="Total Book Orders" value={summaryStats.totalBookOrders} />
         <SummaryCard title="Active Items" value={summaryStats.activeItems} />
         <SummaryCard title="Visits" value={summaryStats.visits.toLocaleString()} />
@@ -393,7 +393,15 @@ export default function AdminDashboard() {
                 scales: {
                   y: {
                     beginAtZero: true,
-                    ticks: { font: { size: 11 } }
+                    ticks: {
+                      font: { size: 11 },
+                      stepSize: 1,
+                      callback: function(value) {
+                        if (Number.isInteger(value)) {
+                          return value;
+                        }
+                      }
+                    }
                   },
                   x: {
                     ticks: { font: { size: 11 } }
