@@ -17,6 +17,8 @@ const shopReviewRouter = require("./routes/shop/review-routes");
 
 const commonFeatureRouter = require("./routes/common/feature-routes");
 const genreStatsRouter = require("./routes/common/genre-stats-routes");
+const categoryStatsRouter = require("./routes/common/category-stats-routes");
+const lowStockRouter = require("./routes/common/low-stock-routes");
 const topProductsRouter = require("./routes/common/top-products-routes");
 
 const brandRoutes = require("./routes/shop/brand-routes");
@@ -63,6 +65,8 @@ app.use("/api/shop/review", shopReviewRouter);
 
 app.use("/api/common/feature", commonFeatureRouter);
 app.use("/api/common/genre-stats", genreStatsRouter);
+app.use("/api/common/category-stats", categoryStatsRouter);
+app.use("/api/common/low-stock-products", lowStockRouter);
 app.use("/api/common/top-products", topProductsRouter);
 
 app.use("/api/brands", brandRoutes);

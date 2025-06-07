@@ -8,6 +8,7 @@ const initialState = {
   categoryList: [],
   brandList: [],
   topGenres: [],
+  topCategories: [],
   topProducts: [],
 };
 
@@ -81,6 +82,11 @@ export const deleteBrand = createAsyncThunk("common/deleteBrand", async (id) => 
 
 export const getTopGenres = createAsyncThunk("common/getTopGenres", async () => {
   const response = await axios.get("http://localhost:5000/api/common/genre-stats");
+  return response.data;
+});
+
+export const getTopCategories = createAsyncThunk("common/getTopCategories", async () => {
+  const response = await axios.get("http://localhost:5000/api/common/category-stats");
   return response.data;
 });
 
@@ -159,6 +165,11 @@ extraReducers: (builder) => {
     // TOP GENRES
     .addCase(getTopGenres.fulfilled, (state, action) => {
       state.topGenres = action.payload.data;
+    })
+
+    // TOP CATEGORIES
+    .addCase(getTopCategories.fulfilled, (state, action) => {
+      state.topCategories = action.payload.data;
     })
 
     // TOP PRODUCTS

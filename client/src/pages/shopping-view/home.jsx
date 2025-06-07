@@ -22,22 +22,16 @@ import { useNavigate } from "react-router-dom";
 import { addToCart, fetchCartItems } from "@/store/shop/cart-slice";
 import { useToast } from "@/components/ui/use-toast";
 import ProductDetailsDialog from "@/components/shopping-view/product-details";
-import { getFeatureImages, getTopGenres, getTopProducts } from "@/store/common-slice";
-
-const genreIcons = [
-  ShirtIcon,
-  CloudLightning,
-  BabyIcon,
-  WatchIcon,
-  UmbrellaIcon,
-];
+import { getFeatureImages, getTopProducts } from "@/store/common-slice";
+import { fetchAllProducts } from "@/store/admin/products-slice";
 
 function ShoppingHome() {
   const [currentSlide, setCurrentSlide] = useState(0);
   const { productDetails } = useSelector(
     (state) => state.shopProducts
   );
-  const { featureImageList, topGenres, topProducts } = useSelector((state) => state.commonFeature);
+  const { featureImageList, topProducts } = useSelector((state) => state.commonFeature);
+  const { productList } = useSelector((state) => state.adminProducts);
 
   const [openDetailsDialog, setOpenDetailsDialog] = useState(false);
 
@@ -93,18 +87,18 @@ function ShoppingHome() {
 
   useEffect(() => {
     dispatch(getFeatureImages());
-    dispatch(getTopGenres());
+    dispatch(fetchAllProducts());
     dispatch(getTopProducts());
   }, [dispatch]);
 
-  // Create dynamic genres with icons
-  const dynamicGenres = topGenres.map((genre, index) => ({
-    id: genre.name.toLowerCase(),
-    name: genre.name,
-    label: genre.name,
-    sales: genre.sales,
-    icon: genreIcons[index % genreIcons.length] // Cycle through available icons
-  }));
+  // Generate low inventory items from product list (same as admin dashboard)
+  const generateLowInventory = () => {
+    return (productList || [])
+      .filter(product => (product.totalStock || 0) <= 5)
+      .sort((a, b) => (a.totalStock || 0) - (b.totalStock || 0)); // Sort by stock ascending
+  };
+
+  const lowStockProducts = generateLowInventory();
 
   return (
     <div className="flex flex-col min-h-screen">
@@ -173,33 +167,26 @@ function ShoppingHome() {
           </div>
         </div>
       </div>
-      {/* Shop by Genre Section */}
+      {/* Limited Stocks Section */}
       <section className="py-6 xs:py-8 sm:py-10 md:py-12 bg-gray-50">
         <div className="container mx-auto px-2 xs:px-3 sm:px-4">
           <h2 className="text-lg xs:text-xl sm:text-2xl md:text-3xl font-bold text-center mb-4 xs:mb-6 sm:mb-8">
-            Shop by Genre
+            Limited Stocks
           </h2>
-          {dynamicGenres.length > 0 ? (
-            <div className="grid grid-cols-2 xs:grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-2 xs:gap-3 sm:gap-4">
-              {dynamicGenres.map((genreItem) => (
-                <Card
-                  key={genreItem.id}
-                  onClick={() =>
-                    handleNavigateToListingPage(genreItem, "genre")
-                  }
-                  className="cursor-pointer hover:shadow-lg transition-shadow responsive-card"
-                >
-                  <CardContent className="flex flex-col items-center justify-center p-2 xs:p-3 sm:p-4 md:p-6">
-                    <genreItem.icon className="w-6 h-6 xs:w-8 xs:h-8 sm:w-10 sm:h-10 md:w-12 md:h-12 mb-2 xs:mb-3 sm:mb-4 text-primary" />
-                    <span className="font-bold text-xs xs:text-sm sm:text-base text-center">{genreItem.label}</span>
-                    <span className="text-xs text-gray-500 mt-1">{genreItem.sales} sold</span>
-                  </CardContent>
-                </Card>
+          {lowStockProducts && lowStockProducts.length > 0 ? (
+            <div className="product-tile-grid justify-center">
+              {lowStockProducts.slice(0, 8).map((productItem) => (
+                <ShoppingProductTile
+                  key={productItem._id}
+                  handleGetProductDetails={handleGetProductDetails}
+                  product={productItem}
+                  handleAddtoCart={handleAddtoCart}
+                />
               ))}
             </div>
           ) : (
             <div className="text-center text-gray-500">
-              <p>No genre statistics available yet. Genres will appear as orders are processed.</p>
+              <p>No low stock products available at the moment.</p>
             </div>
           )}
         </div>
@@ -212,7 +199,7 @@ function ShoppingHome() {
             Top Selling Books
           </h2>
           {topProducts && topProducts.length > 0 ? (
-            <div className="product-tile-grid">
+            <div className="product-tile-grid justify-center">
               {topProducts.map((productItem) => (
                 <ShoppingProductTile
                   key={productItem._id}

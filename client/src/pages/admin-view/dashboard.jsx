@@ -84,7 +84,7 @@ export default function AdminDashboard() {
 
   const summaryStats = calculateStats();
 
-  // Generate dynamic chart data based on actual orders
+  // Generate dynamic chart data based on actual orders with manual input values
   const generateChartData = () => {
     const deliveredOrders = orderList?.filter(order => order.orderStatus === 'delivered') || [];
     
@@ -102,8 +102,26 @@ export default function AdminDashboard() {
       });
     }
 
-    // Calculate monthly revenue and orders
+    // Manual input values for demo purposes
+    const manualRevenueData = {
+      'Mar': 5000,  // March: 5000 pesos
+      'Apr': 2500,  // April: 2500 pesos
+      'May': 8000   // May: 8000 pesos
+    };
+
+    const manualOrderData = {
+      'Mar': 10,    // March: 10 books
+      'Apr': 15,    // April: 15 books
+      'May': 25     // May: 25 books
+    };
+
+    // Calculate monthly revenue with manual input for specific months
     const monthlyRevenue = months.map(month => {
+      // Use manual data if available, otherwise calculate from orders
+      if (manualRevenueData[month.name]) {
+        return manualRevenueData[month.name];
+      }
+      
       return deliveredOrders
         .filter(order => {
           const orderDate = new Date(order.orderDate || order.createdAt);
@@ -112,7 +130,13 @@ export default function AdminDashboard() {
         .reduce((sum, order) => sum + (order.totalAmount || 0), 0);
     });
 
+    // Calculate monthly order counts with manual input for specific months
     const monthlyOrderCounts = months.map(month => {
+      // Use manual data if available, otherwise calculate from orders
+      if (manualOrderData[month.name]) {
+        return manualOrderData[month.name];
+      }
+      
       return deliveredOrders
         .filter(order => {
           const orderDate = new Date(order.orderDate || order.createdAt);
@@ -129,25 +153,6 @@ export default function AdminDashboard() {
     return { months: months.map(m => m.name), monthlyRevenue, monthlyOrderCounts };
   };
 
-  // Generate genre sales data from actual orders
-  const generateGenreSales = () => {
-    const deliveredOrders = orderList?.filter(order => order.orderStatus === 'delivered') || [];
-    const genreStats = {};
-
-    deliveredOrders.forEach(order => {
-      order.cartItems?.forEach(item => {
-        const genre = item.genre || 'Unknown';
-        const quantity = item.quantity || 0;
-        genreStats[genre] = (genreStats[genre] || 0) + quantity;
-      });
-    });
-
-    const labels = Object.keys(genreStats);
-    const data = Object.values(genreStats);
-    const colors = ["#3b82f6", "#60a5fa", "#93c5fd", "#1e40af", "#bfdbfe", "#2563eb", "#1d4ed8"];
-
-    return { labels, data, colors: colors.slice(0, labels.length) };
-  };
 
   // Generate top selling books from actual orders
   const generateTopSellingBooks = () => {
@@ -179,7 +184,6 @@ export default function AdminDashboard() {
   };
 
   const chartData = generateChartData();
-  const genreSalesData = generateGenreSales();
   const allTopSellingBooks = generateTopSellingBooks();
   const allLowInventory = generateLowInventory();
   const topSellingBooks = allTopSellingBooks.slice(0, 5);
@@ -210,17 +214,6 @@ export default function AdminDashboard() {
     ],
   };
 
-  const genreSales = {
-    labels: genreSalesData.labels,
-    datasets: [
-      {
-        label: "Books Sold",
-        data: genreSalesData.data,
-        backgroundColor: genreSalesData.colors,
-        borderWidth: 1,
-      },
-    ],
-  };
 
   const [imageFile, setImageFile] = useState(null);
   const [uploadedImageUrl, setUploadedImageUrl] = useState("");
@@ -318,65 +311,38 @@ export default function AdminDashboard() {
         <SummaryCard title="Visits" value={summaryStats.visits.toLocaleString()} />
       </div>
 
-      {/* Charts Section - Responsive like product grid */}
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 sm:gap-6">
-        {/* Monthly Revenue Chart */}
-        <Card className="lg:col-span-2">
-          <CardHeader className="p-3 sm:p-4 lg:p-6">
-            <CardTitle className="text-base sm:text-lg lg:text-xl">Monthly Revenue</CardTitle>
-          </CardHeader>
-          <CardContent className="p-3 sm:p-4 lg:p-6 pt-0">
-            <div className="h-48 sm:h-64 lg:h-80">
-              <Line
-                data={monthlyRevenue}
-                options={{
-                  responsive: true,
-                  maintainAspectRatio: false,
-                  scales: {
-                    y: {
-                      beginAtZero: true,
-                      ticks: { font: { size: 11 } }
-                    },
-                    x: {
-                      ticks: { font: { size: 11 } }
-                    }
+      {/* Monthly Revenue Chart - Full Width */}
+      <Card>
+        <CardHeader className="p-3 sm:p-4 lg:p-6">
+          <CardTitle className="text-base sm:text-lg lg:text-xl">Monthly Revenue</CardTitle>
+        </CardHeader>
+        <CardContent className="p-3 sm:p-4 lg:p-6 pt-0">
+          <div className="h-48 sm:h-64 lg:h-80">
+            <Line
+              data={monthlyRevenue}
+              options={{
+                responsive: true,
+                maintainAspectRatio: false,
+                scales: {
+                  y: {
+                    beginAtZero: true,
+                    ticks: { font: { size: 11 } }
                   },
-                  plugins: {
-                    legend: {
-                      position: "top",
-                      labels: { font: { size: 12 }, usePointStyle: true, padding: 15 }
-                    }
+                  x: {
+                    ticks: { font: { size: 11 } }
                   }
-                }}
-              />
-            </div>
-          </CardContent>
-        </Card>
-
-        {/* Sales by Genre Chart */}
-        <Card className="lg:col-span-1">
-          <CardHeader className="p-3 sm:p-4 lg:p-6">
-            <CardTitle className="text-base sm:text-lg lg:text-xl">Sales by Genre</CardTitle>
-          </CardHeader>
-          <CardContent className="p-3 sm:p-4 lg:p-6 pt-0">
-            <div className="h-48 sm:h-64 lg:h-80">
-              <Doughnut
-                data={genreSales}
-                options={{
-                  responsive: true,
-                  maintainAspectRatio: false,
-                  plugins: {
-                    legend: {
-                      position: "bottom",
-                      labels: { font: { size: 11 }, padding: 15, usePointStyle: true }
-                    }
+                },
+                plugins: {
+                  legend: {
+                    position: "top",
+                    labels: { font: { size: 12 }, usePointStyle: true, padding: 15 }
                   }
-                }}
-              />
-            </div>
-          </CardContent>
-        </Card>
-      </div>
+                }
+              }}
+            />
+          </div>
+        </CardContent>
+      </Card>
 
       {/* Monthly Orders Chart - Full Width */}
       <Card>
