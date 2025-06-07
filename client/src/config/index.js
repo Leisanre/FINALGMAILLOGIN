@@ -171,6 +171,30 @@ export const genreOptionsMap = {
   // These will automatically match the converted IDs from admin form
 };
 
+// Helper function to get genre display name by ID or name
+export const getGenreDisplayName = (genreId, genreList = []) => {
+  if (!genreId) return '';
+
+  // First try to find by exact ID match in the dynamic list
+  const foundByIdInList = genreList.find(item => item._id === genreId);
+  if (foundByIdInList) return foundByIdInList.name;
+
+  // Try to find by name in the dynamic list (case insensitive)
+  const foundByNameInList = genreList.find(item =>
+    item.name.toLowerCase() === genreId.toLowerCase()
+  );
+  if (foundByNameInList) return foundByNameInList.name;
+
+  // Fallback to static map
+  const staticResult = genreOptionsMap[genreId];
+  if (staticResult) return staticResult;
+
+  // If nothing found, capitalize the input as fallback
+  return genreId.split(' ')
+    .map(word => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase())
+    .join(' ');
+};
+
 export const filterOptions = {
   category: [
     { id: "men", label: "Romance" },

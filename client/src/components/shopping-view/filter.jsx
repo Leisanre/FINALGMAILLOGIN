@@ -18,9 +18,9 @@ function ProductFilter({ filters, handleFilter }) {
     const fetchFilterOptions = async () => {
       try {
         const [brandRes, categoryRes, genreRes] = await Promise.all([
-          axios.get("/api/brands"),
-          axios.get("/api/categories"),
-          axios.get("/api/genres"),
+          axios.get("http://localhost:5000/api/brands"),
+          axios.get("http://localhost:5000/api/categories"),
+          axios.get("http://localhost:5000/api/genres"),
         ]);
         console.log("BRANDS", brandRes);
         console.log("CATEGORIES", categoryRes);

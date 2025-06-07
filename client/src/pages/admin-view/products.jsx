@@ -189,7 +189,13 @@ function AdminProducts() {
     e.preventDefault();
     if (!value.trim()) return;
 
-    dispatch(action(value)).then((data) => {
+    // Capitalize the first letter of each word for better presentation
+    const capitalizedValue = value.trim()
+      .split(' ')
+      .map(word => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase())
+      .join(' ');
+
+    dispatch(action(capitalizedValue)).then((data) => {
       if (data?.payload?.success) {
         toast({ title: `${name} added successfully` });
         setter("");
@@ -216,32 +222,15 @@ function AdminProducts() {
           ? categoryList
           : brandList;
       
-      // For genre, we need to store the ID that matches genreOptionsMap
-      // For other fields, store the name
-      if (field.name === "genre") {
-        return {
-          ...field,
-          type: "select",
-          options: list.map((item) => {
-            const genreName = item.name || item;
-            // Convert genre name to ID that matches genreOptionsMap
-            const genreId = genreName.toLowerCase().replace(/\s+/g, '-');
-            return {
-              id: genreId,
-              label: genreName,
-            };
-          }),
-        };
-      } else {
-        return {
-          ...field,
-          type: "select",
-          options: list.map((item) => ({
-            id: item.name || item,
-            label: item.name || item,
-          })),
-        };
-      }
+      // Store the actual database ID for all fields to maintain consistency
+      return {
+        ...field,
+        type: "select",
+        options: list.map((item) => ({
+          id: item._id || item.name || item,
+          label: item.name || item,
+        })),
+      };
     }
     return field;
   });

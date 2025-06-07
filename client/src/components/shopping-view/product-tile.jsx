@@ -1,33 +1,29 @@
 import { Card, CardContent, CardFooter } from "../ui/card";
 import { Button } from "../ui/button";
-import { brandOptionsMap, categoryOptionsMap, genreOptionsMap } from "@/config";
+import { brandOptionsMap, categoryOptionsMap, getGenreDisplayName } from "@/config";
 import { Badge } from "../ui/badge";
-
-// Helper function to get genre display name
-const getGenreDisplayName = (genre) => {
-  if (!genre) return '';
-  
-  // Check if it's already in the genreOptionsMap (ID format)
-  if (genreOptionsMap[genre]) {
-    return genreOptionsMap[genre];
-  }
-  
-  // Check if it's a genre name that needs to be converted to ID
-  const genreEntries = Object.entries(genreOptionsMap);
-  const matchedEntry = genreEntries.find(([id, name]) => name === genre);
-  if (matchedEntry) {
-    return matchedEntry[1]; // Return the display name
-  }
-  
-  // If not found in map, return as-is (fallback)
-  return genre;
-};
+import { useEffect, useState } from "react";
+import axios from "axios";
 
 function ShoppingProductTile({
   product,
   handleGetProductDetails,
   handleAddtoCart,
 }) {
+  const [genreList, setGenreList] = useState([]);
+
+  useEffect(() => {
+    const fetchGenres = async () => {
+      try {
+        const response = await axios.get("http://localhost:5000/api/genres");
+        setGenreList(response.data.data || []);
+      } catch (error) {
+        console.error("Error fetching genres:", error);
+      }
+    };
+
+    fetchGenres();
+  }, []);
   return (
     <Card className="w-full max-w-xs mx-auto responsive-card hover:shadow-lg transition-shadow duration-200 h-full flex flex-col">
       <div onClick={() => handleGetProductDetails(product?._id)} className="cursor-pointer flex-1 flex flex-col">
@@ -66,7 +62,7 @@ function ShoppingProductTile({
             )}
             {product?.genre && (
               <Badge variant="default" className="text-[10px] px-1 py-0">
-                {getGenreDisplayName(product?.genre)}
+                {getGenreDisplayName(product?.genre, genreList)}
               </Badge>
             )}
           </div>

@@ -9,7 +9,7 @@ import {
 } from "../ui/dialog";
 import { useState } from "react";
 import { useSelector } from "react-redux";
-import { genreOptionsMap } from "@/config";
+import { getGenreDisplayName } from "@/config";
 
 function AdminProductTile({
   product,
@@ -20,40 +20,6 @@ function AdminProductTile({
 }) {
   const [showImageDialog, setShowImageDialog] = useState(false);
   const { genreList } = useSelector((state) => state.commonFeature);
-
-  // Helper function to get proper genre display name
-  const getGenreDisplayName = (genre) => {
-    if (!genre) return "No genre set";
-    
-    // First try to find by exact match in dynamic genre list
-    if (genreList && genreList.length > 0) {
-      const matchedGenre = genreList.find(g => g.name === genre || g._id === genre);
-      if (matchedGenre) return matchedGenre.name;
-      
-      // Try to find by converted ID (name -> id conversion)
-      const convertedId = genre.toLowerCase().replace(/\s+/g, '-');
-      const matchedByConvertedId = genreList.find(g => {
-        const genreId = g.name.toLowerCase().replace(/\s+/g, '-');
-        return genreId === convertedId;
-      });
-      if (matchedByConvertedId) return matchedByConvertedId.name;
-    }
-    
-    // Fallback to static genreOptionsMap
-    if (genreOptionsMap[genre]) {
-      return genreOptionsMap[genre];
-    }
-    
-    // Check if it's a genre name that needs to be converted to ID for static map lookup
-    const genreEntries = Object.entries(genreOptionsMap);
-    const matchedEntry = genreEntries.find(([id, name]) => name === genre);
-    if (matchedEntry) {
-      return matchedEntry[1]; // Return the display name
-    }
-    
-    // If not found in either, return as-is (fallback)
-    return genre;
-  };
   return (
     <Card className="w-full max-w-sm mx-auto h-full flex flex-col">
       <div className="flex-1 flex flex-col">
@@ -108,7 +74,7 @@ function AdminProductTile({
             <div className="flex items-center gap-2">
               <span className="text-xs font-medium text-gray-500">Genre:</span>
               <span className="text-xs text-gray-700">
-                {product?.genre ? getGenreDisplayName(product.genre) : <span className="text-red-500 italic">No genre set</span>}
+                {product?.genre ? getGenreDisplayName(product.genre, genreList) : <span className="text-red-500 italic">No genre set</span>}
               </span>
             </div>
           </div>

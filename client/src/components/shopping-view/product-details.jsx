@@ -13,7 +13,7 @@ import { Label } from "../ui/label";
 import StarRatingComponent from "../common/star-rating";
 import { useEffect, useState } from "react";
 import { addReview, getReviews } from "@/store/shop/review-slice";
-import { brandOptionsMap, categoryOptionsMap, genreOptionsMap } from "@/config";
+import { brandOptionsMap, categoryOptionsMap, genreOptionsMap, getGenreDisplayName } from "@/config";
 
 function ProductDetailsDialog({ open, setOpen, productDetails }) {
   const [reviewMsg, setReviewMsg] = useState("");
@@ -32,9 +32,9 @@ function ProductDetailsDialog({ open, setOpen, productDetails }) {
     const fetchFilterOptions = async () => {
       try {
         const [brandRes, categoryRes, genreRes] = await Promise.all([
-          fetch("/api/brands").then(res => res.json()),
-          fetch("/api/categories").then(res => res.json()),
-          fetch("/api/genres").then(res => res.json()),
+          fetch("http://localhost:5000/api/brands").then(res => res.json()),
+          fetch("http://localhost:5000/api/categories").then(res => res.json()),
+          fetch("http://localhost:5000/api/genres").then(res => res.json()),
         ]);
 
         setDynamicFilters({
@@ -59,18 +59,9 @@ function ProductDetailsDialog({ open, setOpen, productDetails }) {
       let item = dynamicFilters[type].find(item => item._id === id);
       if (item) return item.name;
       
-      // For genres, also try to find by name (in case old data uses name instead of ID)
-      if (type === 'genre') {
-        item = dynamicFilters[type].find(item => item.name === id);
-        if (item) return item.name;
-        
-        // Try to find by converted ID (name -> id conversion)
-        item = dynamicFilters[type].find(item => {
-          const convertedId = item.name.toLowerCase().replace(/\s+/g, '-');
-          return convertedId === id;
-        });
-        if (item) return item.name;
-      }
+      // Also try to find by name (in case old data uses name instead of ID)
+      item = dynamicFilters[type].find(item => item.name === id);
+      if (item) return item.name;
     }
     
     // Fallback to static maps
@@ -80,7 +71,7 @@ function ProductDetailsDialog({ open, setOpen, productDetails }) {
       case 'category':
         return categoryOptionsMap[id] || id;
       case 'genre':
-        return genreOptionsMap[id] || id;
+        return getGenreDisplayName(id, dynamicFilters.genre || []);
       default:
         return id;
     }
